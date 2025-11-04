@@ -55,3 +55,68 @@ The primary solution to mitigate the vanishing/exploding gradient problem is car
 Instead of initializing weights to the same value or a large random value, we use initialization schemes that ensure the variance of the activations remains stable across all layers.
 
 * This involves initializing the weights **randomly** but scaling the variance of the initial weights based on the number of inputs to the layer ($n^{[l-1]}$). Common methods include **He initialization** or **Xavier initialization**.
+
+## Weight Initialization for Deep Networks
+
+When initializing weights in a deep neural network, the goal is to keep the variance of the input to each neuron, $z$, from growing too large (exploding) or shrinking too small (vanishing) as the network gets deeper.
+
+For a single neuron's linear input $z$:
+
+$$
+z = w_1 x_1 + w_2 x_2 + \dots + w_{n} x_{n}
+$$
+
+If the number of input features $n$ (the number of terms being summed) is very large, the sum $z$ will tend to be very large. To counteract this, the individual weights $w_i$ must be kept small.
+
+## General Principle
+
+To maintain a consistent variance of $z$, the initialization variance of the weights, $\text{Var}(W)$, should be inversely proportional to the number of inputs $n^{[l-1]}$ leading into the layer $l$.
+
+$$
+\text{Var}(\mathbf{W}) \propto \frac{1}{n^{[l-1]}}
+$$
+
+The standard deviation for initializing the weights is the square root of this variance.
+
+## Specific Initialization Schemes
+
+The chosen constant depends on the activation function used in the network:
+
+### 1. Simple Initialization (often used for Tanh/Sigmoid)
+
+This scheme aims to keep the variance of the activations close to 1.
+
+$$
+\mathbf{W}^{[l]} = \text{np.random.randn}(\text{shape}) \times \sqrt{\frac{1}{n^{[l-1]}}}
+$$
+
+| Symbol | Description |
+| :--- | :--- |
+| $\mathbf{W}^{[l]}$ | The weight matrix for layer $l$. |
+| $n^{[l-1]}$ | The number of input units to layer $l$ (i.e., the size of the previous layer $l-1$). |
+| $\text{np.random.randn}(\text{shape})$ | Generates a matrix with samples from a standard normal distribution. |
+
+### 2. He Initialization (Best for ReLU)
+
+He initialization is optimized for the **Rectified Linear Unit (ReLU)** activation function. Because ReLU sets half of the activations to zero, a larger scaling factor (specifically $\sqrt{2}$) is needed to maintain the variance.
+
+$$
+\mathbf{W}^{[l]} = \text{np.random.randn}(\text{shape}) \times \sqrt{\frac{2}{n^{[l-1]}}}
+$$
+
+* **Variance:** $\text{Var}(\mathbf{W}) = \frac{2}{n^{[l-1]}}$
+
+### 3. Xavier/Glorot Initialization (Often used for Tanh)
+
+Xavier initialization is an alternative approach that attempts to maintain the variance both in the forward pass and the backward pass (gradients).
+
+$$
+\mathbf{W}^{[l]} = \text{np.random.randn}(\text{shape}) \times \sqrt{\frac{2}{n^{[l-1]} + n^{[l]}}}
+$$
+
+| Symbol | Description |
+| :--- | :--- |
+| $n^{[l-1]}$ | Number of input units to layer $l$. |
+| $n^{[l]}$ | Number of output units from layer $l$. |
+
+when we implement a backpropagation, there is a test called
