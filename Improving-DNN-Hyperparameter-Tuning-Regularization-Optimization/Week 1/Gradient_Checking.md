@@ -11,11 +11,13 @@ The magnitude of the activations and, consequently, the gradients, often grows o
 Consider a deep neural network with $L$ layers, two neurons per layer, and using a linear activation function ($g(z) = z$) with bias $b^{[l]}=0$.
 
 The output of layer 3 is:
+
 $$
 a^{[3]} = \mathbf{W}^{[3]} \mathbf{a}^{[2]} = \mathbf{W}^{[3]} (\mathbf{W}^{[2]} \mathbf{a}^{[1]}) = \mathbf{W}^{[3]} \mathbf{W}^{[2]} \mathbf{W}^{[1]} \mathbf{x}
 $$
 
 The prediction $\hat{y}$ is essentially the product of all weight matrices:
+
 $$
 \hat{y} \approx \mathbf{W}^{[L]} \mathbf{W}^{[L-1]} \cdots \mathbf{W}^{[1]} \mathbf{x}
 $$
@@ -23,11 +25,13 @@ $$
 #### Example with Diagonal Weight Matrices
 
 Assume the weight matrices are identical and diagonal:
+
 $$
 \mathbf{W}^{[l]} = \begin{bmatrix} 1.5 & 0 \\ 0 & 1.5 \end{bmatrix} \quad \text{(or } \mathbf{W}^{[l]} = 1.5 \cdot \mathbf{I} \text{)}
 $$
 
 The network output becomes:
+
 $$
 \hat{y} \approx \left( \begin{bmatrix} 1.5 & 0 \\ 0 & 1.5 \end{bmatrix} \right)^{L} \mathbf{x}
 $$
