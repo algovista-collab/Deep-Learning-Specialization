@@ -99,3 +99,32 @@ $$
 $$
 
 Because the term $\left( 1 - \alpha \frac{\lambda}{m} \right)$ is slightly less than 1, L2 regularization effectively multiplies the weight vector $\mathbf{W}^{[l]}$ by a factor that slightly shrinks its magnitude in every iteration, hence the name **Weight Decay**.
+
+## How Regularization Helps Prevent Overfitting
+
+Regularization, particularly **L2 Regularization** (or Weight Decay), prevents overfitting by constraining the magnitude of the model's weight parameters ($\mathbf{w}$). This limitation simplifies the model and makes its output function smoother.
+
+## Mechanism of Overfitting Prevention
+
+### 1. Reducing the Magnitude of Weights ($\mathbf{w}$)
+* **Cost Function:** The regularization term, $\frac{\lambda}{2m} \| \mathbf{w} \|_2^2$, is added to the loss function $J$.
+* **Minimization:** To minimize the overall cost $J$, the optimization algorithm is forced to choose smaller values for the weights $\mathbf{w}$ as $\lambda$ (the regularization hyperparameter) increases.
+    $$
+    \text{If } \lambda \uparrow \implies \|\mathbf{w}\|_2 \downarrow
+    $$
+
+### 2. Damping the Input to Activation Functions ($z$)
+* **Linear Combination:** The input $z$ to any activation function in a neural network is a linear combination of the weights and the previous layer's output (or input features):
+    $$
+    z = \mathbf{w}^T \mathbf{x} + b
+    $$
+* **Smaller Weights, Smaller $z$:** Since the weights $\mathbf{w}$ are significantly reduced by the regularization, the absolute value of $z$ (the input to the activation function) will also be **reduced** and take on **smaller values**.
+
+### 3. Promoting Near-Linearity in Non-Linear Activation Functions
+
+* **The Tanh Example:** Consider the $\text{tanh}(z)$ activation function. The $\text{tanh}$ function is non-linear over a wide range of $z$ values, allowing the network to learn complex curves. However, when $z$ is close to 0, the function is **approximately linear**.
+    $$
+    \text{As } z \to 0, \quad \text{tanh}(z) \approx z
+    $$
+* **Simplification:** By forcing $z$ to be small, regularization pushes the activation function into its nearly linear region. When every layer's activation function operates closer to linearity, the overall network's output function becomes **less non-linear** and much **smoother**.
+* **Preventing Overfitting:** An overly complex and highly non-linear decision boundary is often what allows a model to perfectly fit noise in the training data (overfitting). By simplifying the function, regularization prevents the model from fitting these minor fluctuations, leading to better **generalization** to unseen data.
