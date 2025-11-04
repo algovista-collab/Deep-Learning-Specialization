@@ -109,9 +109,10 @@ Regularization, particularly **L2 Regularization** (or Weight Decay), prevents o
 ### 1. Reducing the Magnitude of Weights ($\mathbf{w}$)
 * **Cost Function:** The regularization term, $\frac{\lambda}{2m} \| \mathbf{w} \|_2^2$, is added to the loss function $J$.
 * **Minimization:** To minimize the overall cost $J$, the optimization algorithm is forced to choose smaller values for the weights $\mathbf{w}$ as $\lambda$ (the regularization hyperparameter) increases.
-    $$
-    \text{If } \lambda \uparrow \implies \|\mathbf{w}\|_2 \downarrow
-    $$
+
+$$
+\text{If } \lambda \uparrow \implies \|\mathbf{w}\|_2 \downarrow
+$$
 
 ### 2. Damping the Input to Activation Functions ($z$)
 * **Linear Combination:** The input $z$ to any activation function in a neural network is a linear combination of the weights and the previous layer's output (or input features):
