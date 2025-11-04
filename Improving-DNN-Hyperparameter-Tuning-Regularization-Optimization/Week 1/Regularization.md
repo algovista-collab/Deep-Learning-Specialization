@@ -115,9 +115,11 @@ Regularization, particularly **L2 Regularization** (or Weight Decay), prevents o
 
 ### 2. Damping the Input to Activation Functions ($z$)
 * **Linear Combination:** The input $z$ to any activation function in a neural network is a linear combination of the weights and the previous layer's output (or input features):
-    $$
-    z = \mathbf{w}^T \mathbf{x} + b
-    $$
+
+$$
+z = \mathbf{w}^T \mathbf{x} + b
+$$
+
 * **Smaller Weights, Smaller $z$:** Since the weights $\mathbf{w}$ are significantly reduced by the regularization, the absolute value of $z$ (the input to the activation function) will also be **reduced** and take on **smaller values**.
 
 ### 3. Promoting Near-Linearity in Non-Linear Activation Functions
