@@ -202,3 +202,41 @@ The average magnitude now is $(4+0+12+0)/4 = \mathbf{4}$. This value is closer t
 
 * **Different $keep\_prob$ by Layer:** It is common practice to use different values of $keep\_prob$ for different layers. For example, layers with many parameters (often earlier or hidden layers) might use a lower $keep\_prob$ (e.g., 0.5), while input layers might use a higher $keep\_prob$ (e.g., 0.8-0.9), or not use dropout at all.
 * **Downside:** Since the network structure changes randomly in every iteration, the cost function $J$ is **not perfectly defined** or easily computable (it's hard to track the true function being optimized). However, this empirical effectiveness outweighs the theoretical downside.
+
+## Other Regularization Methods: Early Stopping
+
+## 1. Early Stopping as Regularization
+
+**Early Stopping** is a simple and widely used regularization technique that halts the training process before the model has completely converged on the training data.
+
+* **Mechanism:**
+    * The cost function $J$ on the **training set** continuously decreases as training iterations proceed.
+    * The error on the **development (dev) set** also decreases initially, but after a certain number of iterations, it begins to **increase**. This point marks the onset of overfitting to the training data.
+* **Stopping Point:** Training is stopped right at the point where the dev set error starts to increase.
+* **Resulting Model:** By stopping early, the model saves the parameters $\mathbf{W}$ that resulted in the best performance on the dev set. These parameters are typically of a **mid-size norm** (i.e., not fully minimized, but also not excessively large), which has an effect similar to **L2 Regularization** (by picking a neural network with a smaller weight norm).
+
+---
+
+## 2. Downside: Violating Orthogonalization
+
+The primary downside of Early Stopping is that it **violates the principle of Orthogonalization** in machine learning development.
+
+### Orthogonalization Principle
+Orthogonalization suggests that machine learning development tasks should be treated as **separate, independent processes** (or "orthogonal"):
+
+1.  **Optimize the Cost Function $J$:** The goal is purely to reduce the cost on the training set (e.g., using Gradient Descent, Adam, etc.).
+2.  **Prevent Overfitting:** The goal is purely to ensure the model generalizes well to unseen data (e.g., using L2 regularization, dropout, getting more data).
+
+These two tasks should be optimized sequentially and independently to simplify the tuning process:
+
+* **Adjust hyperparameter $\alpha$** (learning rate) to optimize $J$.
+* **Adjust hyperparameter $\lambda$** (regularization term) to prevent overfitting.
+
+### The Complication of Early Stopping
+
+* **Combined Goal:** Early stopping **combines both tasks**. By choosing the iteration number to stop, you are simultaneously deciding:
+    * *How much* you want to minimize the training cost $J$.
+    * *How much* you want to regularize the weights.
+* **Complication:** If the dev set error is too high, you don't know if the problem is poor optimization (need more iterations/better learning rate) or too much variance (need more regularization). This intertwined control makes tuning complex.
+
+> **Contrast with Dropout:** Dropout and L2 regularization do not rely on the number of training epochs to achieve their goal; they consistently penalize large weights and reduce reliance on single features, maintaining the separation of the optimization and regularization goals.
