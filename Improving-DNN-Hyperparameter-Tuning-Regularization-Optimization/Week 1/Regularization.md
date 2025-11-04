@@ -123,8 +123,10 @@ Regularization, particularly **L2 Regularization** (or Weight Decay), prevents o
 ### 3. Promoting Near-Linearity in Non-Linear Activation Functions
 
 * **The Tanh Example:** Consider the $\text{tanh}(z)$ activation function. The $\text{tanh}$ function is non-linear over a wide range of $z$ values, allowing the network to learn complex curves. However, when $z$ is close to 0, the function is **approximately linear**.
-    $$
-    \text{As } z \to 0, \quad \text{tanh}(z) \approx z
-    $$
+
+$$
+\text{As } z \to 0, \quad \text{tanh}(z) \approx z
+$$
+
 * **Simplification:** By forcing $z$ to be small, regularization pushes the activation function into its nearly linear region. When every layer's activation function operates closer to linearity, the overall network's output function becomes **less non-linear** and much **smoother**.
 * **Preventing Overfitting:** An overly complex and highly non-linear decision boundary is often what allows a model to perfectly fit noise in the training data (overfitting). By simplifying the function, regularization prevents the model from fitting these minor fluctuations, leading to better **generalization** to unseen data.
