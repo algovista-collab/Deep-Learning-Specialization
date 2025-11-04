@@ -192,3 +192,34 @@ $$
 | $\le 10^{-7}$ (or $10^{-8}$) | **Excellent.** Implementation is very likely correct. | Proceed with training. |
 | $\approx 10^{-5}$ | **Good.** Acceptable for a complex model, but warrants re-checking. | Proceed, but monitor closely. |
 | $\ge 10^{-3}$ | **Worry.** The implementation likely contains a **bug**. | Stop and debug backpropagation. |
+
+## Gradient Checking Usage Guidelines
+
+While Gradient Checking is invaluable for verifying the correctness of your backpropagation implementation, it is **too slow** to use during the actual training process.
+
+## 1. Do NOT Use Gradient Checking in Training
+
+Gradient Checking is only a **debugging tool** and must be turned off once verification is complete.
+
+* **Reason:** Computing $d\boldsymbol{\theta}_{\text{approx}}[i]$ using the numerical approximation formula requires two evaluations of the full cost function $J$ for **every single parameter** $\theta_i$ in your entire network.
+    * Since the total number of parameters ($||\boldsymbol{\theta}||$) can be millions or even billions in deep networks, this process is **extremely slow** and computationally prohibitive for iterative training.
+
+* **Training Strategy:**
+    1.  Use **Backpropagation** to compute the analytical gradient $d\boldsymbol{\theta}$.
+    2.  Use these efficient backpropagation derivatives to update the parameters during training.
+
+## 2. Gradient Checking Workflow
+
+The proper workflow for integrating Gradient Checking is:
+
+1.  **Develop:** Write your code for **Forward Propagation** and **Backpropagation**.
+2.  **Verify:** Turn Gradient Checking **ON**. Compute both $d\boldsymbol{\theta}_{\text{approx}}$ and $d\boldsymbol{\theta}$, and compare them using the relative difference formula.
+3.  **Debug:** If the difference is large ($\ge 10^{-3}$), your backpropagation implementation has a bug.
+4.  **Train:** Once the difference is sufficiently small ($\le 10^{-7}$), turn Gradient Checking **OFF** and proceed with training the model using only the much faster Backpropagation algorithm.
+
+## 3. Debugging a Failure
+
+If the algorithm fails Gradient Checking (meaning $d\boldsymbol{\theta}_{\text{approx}}$ and $d\boldsymbol{\theta}$ do not match):
+
+* **Locate the Bug:** Instead of checking the entire vector $d\boldsymbol{\theta}$ at once, look at the individual components to try to identify the bug.
+    * Examine the individual derivative components like $d\mathbf{W}^{[l]}$ or $d\mathbf{b}^{[l]}$. Often, simple errors in the dimensions or the calculation of the bias gradients (e.g., $d\mathbf{b}^{[l]}$) are the culprits.
