@@ -119,4 +119,74 @@ $$
 | $n^{[l-1]}$ | Number of input units to layer $l$. |
 | $n^{[l]}$ | Number of output units from layer $l$. |
 
-when we implement a backpropagation, there is a test called
+## Gradient Checking (Numerical Gradient Verification)
+
+Gradient Checking is a test used to ensure that the mathematical implementation of the **backpropagation** algorithm (which computes the analytical gradients, $\partial J / \partial \theta$) is numerically correct.
+
+## 1. The Core Concept: Numerical Approximation
+
+The test compares the analytical gradient computed by backpropagation with a numerical approximation derived from the definition of the derivative.
+
+The definition of the derivative $f'(\theta)$ is:
+$$
+f'(\theta) = \lim_{\epsilon \to 0} \frac{f(\theta + \epsilon) - f(\theta - \epsilon)}{2 \epsilon}
+$$
+
+The numerical approximation used for gradient checking is:
+$$
+g(\theta)_{\text{approx}} = \frac{f(\theta + \epsilon) - f(\theta - \epsilon)}{2 \epsilon}
+$$
+
+* When the analytical gradient $g(\theta)$ computed by backpropagation is **approximately equal** to the numerical approximation $g(\theta)_{\text{approx}}$, the implementation is correct.
+
+## 2. Gradient Checking Procedure
+
+The procedure involves converting all parameters and their gradients into large vectors to check them simultaneously.
+
+### Step A: Vectorization of Parameters
+
+All parameters of the neural network—weights $\mathbf{W}^{[1]}, \dots, \mathbf{W}^{[L]}$ and biases $\mathbf{b}^{[1]}, \dots, \mathbf{b}^{[L]}$—are **reshaped** and concatenated into one large vector, $\boldsymbol{\theta}$.
+
+$$
+\boldsymbol{\theta} = \text{Vectorize}(\mathbf{W}^{[1]}, \mathbf{b}^{[1]}, \dots, \mathbf{W}^{[L]}, \mathbf{b}^{[L]})
+$$
+
+The cost function $J$ can then be viewed as a function of this single vector: $J(\boldsymbol{\theta})$.
+
+### Step B: Vectorization of Gradients
+
+Similarly, all analytical gradients computed by backpropagation—$d\mathbf{W}^{[1]}, d\mathbf{b}^{[1]}, \dots$—are vectorized into one large gradient vector, $d\boldsymbol{\theta}$.
+
+$$
+d\boldsymbol{\theta} = \text{Vectorize}(d\mathbf{W}^{[1]}, d\mathbf{b}^{[1]}, \dots, d\mathbf{W}^{[L]}, d\mathbf{b}^{[L]})
+$$
+
+**Goal:** We are checking if $d\boldsymbol{\theta}$ is the true gradient of $J(\boldsymbol{\theta})$.
+
+### Step C: Numerical Gradient Calculation
+
+For each element $\theta_i$ in the vector $\boldsymbol{\theta}$, the numerical approximation of the partial derivative $\frac{\partial J}{\partial \theta_i}$ is calculated:
+
+$$
+d\boldsymbol{\theta}_{\text{approx}}[i] = \frac{J(\theta_1, \dots, \theta_i + \epsilon, \dots) - J(\theta_1, \dots, \theta_i - \epsilon, \dots)}{2 \epsilon}
+$$
+
+This results in the numerical gradient vector $d\boldsymbol{\theta}_{\text{approx}}$.
+
+### Step D: Comparison
+
+The final step is to measure the **Euclidean distance** (L2 norm) between the analytical gradient vector ($d\boldsymbol{\theta}$) and the numerical gradient vector ($d\boldsymbol{\theta}_{\text{approx}}$).
+
+The recommended metric for comparison is the **relative difference**:
+
+$$
+\text{Difference} = \frac{\| d\boldsymbol{\theta}_{\text{approx}} - d\boldsymbol{\theta} \|_2}{\| d\boldsymbol{\theta}_{\text{approx}} \|_2 + \| d\boldsymbol{\theta} \|_2}
+$$
+
+#### Interpretation:
+
+| Difference Value | Conclusion | Action |
+| :--- | :--- | :--- |
+| $\le 10^{-7}$ (or $10^{-8}$) | **Excellent.** Implementation is very likely correct. | Proceed with training. |
+| $\approx 10^{-5}$ | **Good.** Acceptable for a complex model, but warrants re-checking. | Proceed, but monitor closely. |
+| $\ge 10^{-3}$ | **Worry.** The implementation likely contains a **bug**. | Stop and debug backpropagation. |
