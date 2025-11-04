@@ -157,7 +157,7 @@ The cost function $J$ can then be viewed as a function of this single vector: $J
 
 ### Step B: Vectorization of Gradients
 
-Similarly, all analytical gradients computed by backpropagation—$d\mathbf{W}^{[1]}, d\mathbf{b}^{[1]}, \dots$—are vectorized into one large gradient vector, $d\boldsymbol{\theta}$.
+Similarly, all analytical gradients computed by backpropagation— $$d\mathbf{W}^{[1]}, d\mathbf{b}^{[1]}, \dots$$ —are vectorized into one large gradient vector, $d\boldsymbol{\theta}$.
 
 $$
 d\boldsymbol{\theta} = \text{Vectorize}(d\mathbf{W}^{[1]}, d\mathbf{b}^{[1]}, \dots, d\mathbf{W}^{[L]}, d\mathbf{b}^{[L]})
