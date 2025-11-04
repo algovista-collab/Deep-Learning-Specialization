@@ -189,9 +189,11 @@ The purpose of **Inverted Dropout scaling** during training is to eliminate the 
 Without scaling, the test-time output (5) is much higher than the training-time average (2). This mismatch causes a performance drop.
 
 **With Inverted Dropout Scaling (at Training Time):**
+
 $$
 \mathbf{h}_{\text{scaled}} = \mathbf{h}' \times \frac{1}{keep\_prob} = [2, 0, 6, 0] \times \frac{1}{0.5} = [4, 0, 12, 0]
 $$
+
 The average magnitude now is $(4+0+12+0)/4 = \mathbf{4}$. This value is closer to the test-time average (5) and accounts for the expected reduction in magnitude.
 
 ---
