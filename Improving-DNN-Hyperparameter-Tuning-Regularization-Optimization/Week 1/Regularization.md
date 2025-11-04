@@ -41,9 +41,11 @@ $$
 
 #### L1 Norm
 The L1 regularization term added to the cost function is:
+
 $$
 \frac{\lambda}{2m} \| \mathbf{w} \|_1 = \frac{\lambda}{2m} \sum_{j=1}^{n_x} |w_j|
 $$
+
 * **Sparsity:** L1 regularization encourages the weights $\mathbf{w}$ to become **sparse** (i.e., many weights $w_j$ will become exactly **zero**).
 * **Advantage:** Sparse models require **less memory** because sparse matrices store only the non-zero elements.
 
