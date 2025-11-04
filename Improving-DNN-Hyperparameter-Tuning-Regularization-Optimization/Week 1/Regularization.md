@@ -75,20 +75,25 @@ $$
 The update step for the weights during Gradient Descent is modified by the regularization term:
 
 1.  **Gradient Calculation (from Backpropagation):**
-    $$
-    d\mathbf{W}^{[l]} = \left( \frac{\partial J}{\partial \mathbf{W}^{[l]}} \right)_{\text{from backprop}} + \frac{\lambda}{m} \mathbf{W}^{[l]}
-    $$
+
+$$
+d\mathbf{W}^{[l]} = \left( \frac{\partial J}{\partial \mathbf{W}^{[l]}} \right)_{\text{from backprop}} + \frac{\lambda}{m} \mathbf{W}^{[l]}
+$$
+
 2.  **Weight Update:**
-    $$
-    \mathbf{W}^{[l]} := \mathbf{W}^{[l]} - \alpha \cdot d\mathbf{W}^{[l]}
-    $$
+
+$$
+\mathbf{W}^{[l]} := \mathbf{W}^{[l]} - \alpha \cdot d\mathbf{W}^{[l]}
+$$
 
 Substituting the first equation into the second:
+
 $$
 \mathbf{W}^{[l]} := \mathbf{W}^{[l]} - \alpha \left( \left( \frac{\partial J}{\partial \mathbf{W}^{[l]}} \right)_{\text{from backprop}} + \frac{\lambda}{m} \mathbf{W}^{[l]} \right)
 $$
 
 Rearranging the terms:
+
 $$
 \mathbf{W}^{[l]} := \underbrace{\left( 1 - \alpha \frac{\lambda}{m} \right) \mathbf{W}^{[l]}}_{\text{Decay Term}} - \alpha \left( \frac{\partial J}{\partial \mathbf{W}^{[l]}} \right)_{\text{from backprop}}
 $$
