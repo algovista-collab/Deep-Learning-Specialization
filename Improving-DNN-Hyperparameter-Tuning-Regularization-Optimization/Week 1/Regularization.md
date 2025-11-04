@@ -133,3 +133,7 @@ $$
 
 * **Simplification:** By forcing $z$ to be small, regularization pushes the activation function into its nearly linear region. When every layer's activation function operates closer to linearity, the overall network's output function becomes **less non-linear** and much **smoother**.
 * **Preventing Overfitting:** An overly complex and highly non-linear decision boundary is often what allows a model to perfectly fit noise in the training data (overfitting). By simplifying the function, regularization prevents the model from fitting these minor fluctuations, leading to better **generalization** to unseen data.
+
+<img width="437" height="196" alt="image" src="https://github.com/user-attachments/assets/61d87e70-1583-4498-9ec4-dbc0d304f79d" />
+
+
