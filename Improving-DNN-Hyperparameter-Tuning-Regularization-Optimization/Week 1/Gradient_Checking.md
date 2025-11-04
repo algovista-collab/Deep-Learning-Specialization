@@ -128,11 +128,13 @@ Gradient Checking is a test used to ensure that the mathematical implementation 
 The test compares the analytical gradient computed by backpropagation with a numerical approximation derived from the definition of the derivative.
 
 The definition of the derivative $f'(\theta)$ is:
+
 $$
 f'(\theta) = \lim_{\epsilon \to 0} \frac{f(\theta + \epsilon) - f(\theta - \epsilon)}{2 \epsilon}
 $$
 
 The numerical approximation used for gradient checking is:
+
 $$
 g(\theta)_{\text{approx}} = \frac{f(\theta + \epsilon) - f(\theta - \epsilon)}{2 \epsilon}
 $$
@@ -145,7 +147,7 @@ The procedure involves converting all parameters and their gradients into large 
 
 ### Step A: Vectorization of Parameters
 
-All parameters of the neural network—weights $\mathbf{W}^{[1]}, \dots, \mathbf{W}^{[L]}$ and biases $\mathbf{b}^{[1]}, \dots, \mathbf{b}^{[L]}$—are **reshaped** and concatenated into one large vector, $\boldsymbol{\theta}$.
+All parameters of the neural network—weights $\mathbf{W}^{[1]}, \dots, \mathbf{W}^{[L]}$ and biases $$\mathbf{b}^{[1]}, \dots, \mathbf{b}^{[L]}$$—are **reshaped** and concatenated into one large vector, $\boldsymbol{\theta}$.
 
 $$
 \boldsymbol{\theta} = \text{Vectorize}(\mathbf{W}^{[1]}, \mathbf{b}^{[1]}, \dots, \mathbf{W}^{[L]}, \mathbf{b}^{[L]})
