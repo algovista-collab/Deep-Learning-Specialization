@@ -1,5 +1,7 @@
 # Evaluation and Regularization in Machine Learning
 
+<img width="1838" height="917" alt="image" src="https://github.com/user-attachments/assets/5f2ec77d-eee0-4ca9-87b8-a3431b415aa5" />
+
 ## 1. Data Distribution and Splitting
 
 **Rule of Thumb:**
