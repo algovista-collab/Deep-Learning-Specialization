@@ -380,3 +380,61 @@ While we have focused on the **Convolutional (Conv)** layer, a full network usua
 3.  **FC (Fully Connected):** Standard neural network layers used at the very end of the network.
 
 ---
+
+# Pooling Layers
+
+Pooling layers are used to reduce the spatial dimensions (Height and Width) of the representation, which speeds up computation and helps prevent overfitting.
+
+---
+
+## 1. Max Pooling
+Max pooling is the most common type of pooling. It works by sliding a window over the input and selecting the **maximum value** from each region.
+
+### How it works (Example: $f=2, s=2$):
+If you have a $4 \times 4$ input and apply a $2 \times 2$ filter with a stride of $2$:
+1. Divide the image into four $2 \times 2$ quadrants.
+2. Pick the largest number in each quadrant.
+
+
+
+### The Intuition:
+* **Feature Detection:** A large number usually represents a detected feature (e.g., a cat's whisker). 
+* **Preservation:** If the feature is found anywhere in that region, the high value is kept. If it's not found, the result stays low.
+* **Robustness:** This makes the network less sensitive to exactly *where* a feature is located in the image.
+
+---
+
+## 2. Average Pooling
+Instead of taking the maximum value, this layer computes the **average** of all values in the window.
+* **Usage:** Much less common than Max Pooling.
+* **Exception:** Sometimes used at the very end of a deep network to collapse a large volume (e.g., $7 \times 7 \times 1000$) into a $1 \times 1 \times 1000$ representation.
+
+---
+
+## 3. Key Properties of Pooling
+
+### No Learned Parameters
+Unlike Convolutional layers, pooling has **no weights or biases ($W, b$)**. 
+* Gradient descent has nothing to "learn" here.
+* It is a fixed calculation based purely on the hyperparameters you choose.
+
+### Multi-Channel Pooling
+Pooling is performed **independently** on each channel. 
+* If the input is $5 \times 5 \times 10$, and you apply pooling, the output will still have **10 channels**. The depth never changes during a pooling operation.
+
+
+
+---
+
+## 4. Hyperparameters Summary
+| Parameter | Common Choice | Result |
+| :--- | :--- | :--- |
+| **Filter Size ($f$)** | $2$ or $3$ | Size of the "viewing window" |
+| **Stride ($s$)** | $2$ | How far the window jumps |
+| **Padding ($p$)** | $0$ | Almost never used in pooling |
+| **Type** | Max or Average | Method of calculation |
+
+**Output Size Formula:**
+$$\left\lfloor \frac{n + 2p - f}{s} + 1 \right\rfloor$$
+
+---
