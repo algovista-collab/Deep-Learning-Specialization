@@ -234,3 +234,54 @@ There is a technical distinction between the math used in deep learning and the 
 | **Stride** | $s$ | Decreases output size (compresses) |
 
 ---
+
+# Convolutions over Volumes
+
+Most real-world images aren't just grids of pixels; they are 3D volumes. This lesson explains how to apply filters to multi-channel data.
+
+---
+
+## 1. Convolving with RGB Images
+An RGB image is a volume of size **$6 \times 6 \times 3$** (Height $\times$ Width $\times$ Channels).
+* **The Rule:** The number of channels in the **filter** must match the number of channels in the **input**.
+* **The Filter:** To process an RGB image, you use a **$3 \times 3 \times 3$** filter.
+* **The Math:** You perform $27$ multiplications ($3 \times 3 \times 3$) and sum them all together into a single number. 
+
+
+
+> **Important:** Even though the input and filter are 3D, if you use **one** filter, the output is a **2D** matrix (e.g., $4 \times 4 \times 1$).
+
+---
+
+## 2. Detecting Specific Features
+By adjusting the values in the three layers of the filter, you can target specific colors:
+* **Red-Only Edge Detection:** Set the "Red" layer of the filter to edge-detection values ($1, 0, -1$) and set the Green and Blue layers to all zeros.
+* **General Edge Detection:** Use the same edge-detection values across all three layers to detect edges regardless of color.
+
+---
+
+## 3. Multiple Filters (The Power of Depth)
+In a real neural network, you don't just want to detect one type of edge. You might want to detect vertical edges, horizontal edges, 45° edges, etc., all at once.
+
+1.  **Filter 1 (Vertical):** Produces a $4 \times 4$ output.
+2.  **Filter 2 (Horizontal):** Produces a different $4 \times 4$ output.
+3.  **Stacking:** You stack these outputs together to create a **volume**.
+
+
+
+### Summary of Dimensions:
+If you have:
+* **Input:** $n \times n \times n_c$
+* **Filter:** $f \times f \times n_c$
+* **Number of Filters:** $n_c'$
+
+The **Output** will be: 
+$$(n - f + 1) \times (n - f + 1) \times n_c'$$
+
+---
+
+## 4. Terminology Note: Channels vs. Depth
+The third dimension (the "3" in $6 \times 6 \times 3$) is often called **Channels** or **Depth**. 
+* The instructor prefers **Channels** because "Depth" is usually used to describe how many layers are in the entire neural network, which can be confusing.
+
+---
