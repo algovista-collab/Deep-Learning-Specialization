@@ -186,3 +186,51 @@ While not a strict rule, computer vision practitioners almost exclusively use od
 2.  **Center Pixel:** They have a specific "central pixel," which is helpful for tracking the position of the filter relative to the image.
 
 ---
+
+# Convolutional Networks: Strided Convolutions
+
+Strided convolution is a variation of the convolution operation where the filter "jumps" multiple pixels at a time instead of moving one pixel at a time.
+
+---
+
+## 1. How Strided Convolution Works
+The **stride ($s$)** determines the step size of the filter. 
+* **Stride = 1:** The filter moves one pixel at a time (standard).
+* **Stride = 2:** The filter jumps two pixels over (skipping one position).
+
+
+
+This results in a much smaller output matrix, as there are fewer valid positions for the filter to sit.
+
+---
+
+## 2. Calculating Output Dimensions
+When using an $n \times n$ image, an $f \times f$ filter, padding $p$, and stride $s$, the output size is calculated as:
+
+$$\lfloor \frac{n + 2p - f}{s} + 1 \rfloor \times \lfloor \frac{n + 2p - f}{s} + 1 \rfloor$$
+
+* **Rounding Down (Floor):** If the fraction is not an integer, we round down ($\lfloor \dots \rfloor$).
+* **The "Legal" Rule:** In practice, a convolution is only computed if the filter is contained **entirely** within the image (or padded image). If a stride would cause the filter to hang off the edge, that computation is skipped.
+
+---
+
+## 3. Convolution vs. Cross-Correlation
+There is a technical distinction between the math used in deep learning and the math used in signal processing:
+
+* **Mathematical Convolution:** Requires flipping the filter horizontally and vertically (mirroring) before doing the element-wise products.
+* **Cross-Correlation:** Skips the flipping and performs the element-wise product directly.
+
+**In Deep Learning:** We skip the flipping step for simplicity. Even though we call it "convolution," it is technically **cross-correlation**.
+* **Why it works:** In a neural network, the filter values are learned. If the network needs a flipped filter, it will simply learn those flipped values during training.
+* **Benefit:** Omitting the flip simplifies the implementation and doesn't hurt performance.
+
+---
+
+## Summary of Parameters
+| Parameter | Symbol | Effect on Output Size |
+| :--- | :--- | :--- |
+| **Padding** | $p$ | Increases output size |
+| **Filter Size** | $f$ | Decreases output size |
+| **Stride** | $s$ | Decreases output size (compresses) |
+
+---
