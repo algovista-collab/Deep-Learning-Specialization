@@ -143,3 +143,46 @@ The most powerful idea in CNNs is that we don't need to hand-pick these numbers.
 * **Versatility:** The network can learn to detect edges at any angle (45°, 70°, etc.) or even complex patterns that humans don't have names for.
 
 ---
+
+# Convolutional Networks: Padding
+
+Padding is the process of adding a border of pixels (usually zeros) around the edges of an input image before applying a convolution.
+
+---
+
+## 1. Why do we need Padding?
+Without padding, two major issues occur:
+1.  **Shrinking Output:** Every time you apply a filter, the image gets smaller. In a deep network with 100 layers, the image would disappear entirely after a few operations.
+2.  **Information Loss at Edges:** Pixels at the corners and edges are only "touched" once by the filter, whereas pixels in the middle are overlapped many times. This means the network "throws away" valuable detail from the image boundaries.
+
+
+
+---
+
+## 2. The Mathematics of Padding
+If we have an $n \times n$ image, an $f \times f$ filter, and a padding amount $p$:
+* The padded image becomes $(n + 2p) \times (n + 2p)$.
+* **Output Size Formula:** $$(n + 2p - f + 1) \times (n + 2p - f + 1)$$
+
+*Example:* A $6 \times 6$ image with $p=1$ becomes $8 \times 8$. Convolving with a $3 \times 3$ filter results in a $6 \times 6$ output ($8 - 3 + 1 = 6$), preserving the original size.
+
+---
+
+## 3. Valid vs. Same Convolutions
+There are two standard conventions for choosing the amount of padding:
+
+| Type | Definition | Padding Amount ($p$) | Output Size |
+| :--- | :--- | :--- | :--- |
+| **Valid** | No padding | $p = 0$ | $n - f + 1$ |
+| **Same** | Output size = Input size | $p = \frac{f - 1}{2}$ | $n$ |
+
+> **Note:** For "Same" convolution to work with a symmetric border, the filter size ($f$) must be **odd**.
+
+---
+
+## 4. Why Use Odd-Sized Filters ($3 \times 3, 5 \times 5$)?
+While not a strict rule, computer vision practitioners almost exclusively use odd-numbered filters because:
+1.  **Symmetry:** They allow for even padding on all sides (left/right and top/bottom).
+2.  **Center Pixel:** They have a specific "central pixel," which is helpful for tracking the position of the filter relative to the image.
+
+---
