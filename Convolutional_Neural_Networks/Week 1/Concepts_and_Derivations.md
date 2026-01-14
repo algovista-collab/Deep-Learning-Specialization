@@ -480,3 +480,44 @@ One of the most surprising things about ConvNets is where the "memory" (paramete
 * **Fully Connected (FC) Layers:** Have **TONS** of parameters. Most of the computer's memory is used here at the very end to link the "clues" to the final "decision."
 
 ---
+
+# Why Convolutions?
+
+Convolutional layers are superior to standard "fully connected" layers for images because they solve the problem of having **too many parameters**.
+
+---
+
+## 1. The Two Big Advantages
+If you used a standard neural network for a tiny $32 \times 32$ image, you would need **14 million parameters**. With a ConvNet, you only need **156**. Here is why:
+
+### A. Parameter Sharing
+A feature detector (like a "vertical line finder") that works in the top-left corner of a photo is just as useful in the bottom-right corner. 
+* **The Logic:** Instead of learning a new "eye detector" for every single pixel location, the network learns **one** detector and slides it across the whole image.
+* **Result:** Fewer things to learn = faster training and less chance of the computer just "memorizing" the training photos (overfitting).
+
+
+### B. Sparsity of Connections
+In a normal layer, every output depends on every single input pixel. In a ConvNet, each output value depends only on a small **local neighborhood** of pixels (the $3 \times 3$ or $5 \times 5$ area).
+* **The Logic:** A pixel in the bottom-right of a photo doesn't help you decide if there is an eye in the top-left.
+* **Result:** This "local focus" makes the network much more efficient and stable.
+
+---
+
+## 2. Translation Invariance
+ConvNets are great at recognizing that **a cat is still a cat** even if it moves a few pixels to the left or right. Because the same filter slides over every position, the network naturally learns to recognize patterns regardless of where they appear in the frame.
+
+---
+
+## 3. Putting It All Together: Training
+To actually make the AI work, you follow the same steps as a basic neural network:
+1.  **Initialize:** Start with random numbers for all your filter weights ($W$) and biases ($b$).
+2.  **Loss Function:** Use a cost function ($J$) to measure how "wrong" the computer's guesses are compared to the real labels (Cat vs. No Cat).
+3.  **Optimize:** Use an optimizer (like **Adam** or **Gradient Descent**) to tweak those weights until the cost function is as small as possible.
+
+---
+
+## Summary of the Week
+You’ve gone from "What is a convolution?" to seeing a full **Image Recognition System**. 
+* **Conv Layers:** Find the clues.
+* **Pool Layers:** Shrink the clues and ignore the noise.
+* **FC Layers:** Use the clues to make a final decision.
