@@ -97,8 +97,49 @@ $$
 In practice, you don't write the nested loops for these multiplications. Deep learning frameworks provide optimized functions:
 * **TensorFlow:** `tf.nn.conv2d`
 * **Keras:** `Conv2D`
-* **Programming Notation:** Usually represented by the asterisk symbol ($*$), though it should not be confused with standard multiplication.
+* **Programming Notation:** Usually represented by the asterisk symbol ($*$).
 
 ---
 
-> **Next Step:** Would you like to see how we can modify this filter to detect **Horizontal Edges**, or should we discuss how the neural network **learns** these filter values automatically?
+# Edge Detection: Beyond Basic Vertical Filters
+
+We can refine edge detection by distinguishing between transition directions and using specialized filters. Ultimately, Deep Learning allows the network to learn these filters automatically.
+
+---
+
+## 1. Positive vs. Negative Edges
+The direction of the brightness transition changes the sign of the output:
+* **Light to Dark:** Using a vertical filter on a white-to-black transition results in a **positive** value (e.g., $+30$).
+* **Dark to Light:** Applying the same filter to a black-to-white transition results in a **negative** value (e.g., $-30$).
+* **Insight:** The sign tells the network the "direction" of the edge. Taking the absolute value would identify the edge regardless of direction.
+
+
+
+---
+
+## 2. Specialized Hand-Coded Filters
+Researchers historically developed specific matrices to make edge detection more robust:
+
+| Filter Type | Matrix Logic | Benefit |
+| :--- | :--- | :--- |
+| **Sobel Filter** | $\begin{bmatrix} 1 & 0 & -1 \\ 2 & 0 & -2 \\ 1 & 0 & -1 \end{bmatrix}$ | Puts more weight on the central pixel; more robust to noise. |
+| **Scharr Filter** | $\begin{bmatrix} 3 & 0 & -3 \\ 10 & 0 & -10 \\ 3 & 0 & -3 \end{bmatrix}$ | Offers even stronger weight for specific edge properties. |
+
+
+
+---
+
+## 3. Horizontal Edge Detection
+By rotating a vertical filter 90 degrees, we can detect horizontal transitions (top-to-bottom):
+* **Filter:** $\begin{bmatrix} 1 & 1 & 1 \\ 0 & 0 & 0 \\ -1 & -1 & -1 \end{bmatrix}$
+* **Logic:** Bright pixels on top and dark pixels on the bottom result in a strong positive output.
+
+---
+
+## 4. Learning Filters via Backpropagation
+The most powerful idea in CNNs is that we don't need to hand-pick these numbers.
+* **Parameters:** Treat the 9 numbers in a $3 \times 3$ filter as **parameters** ($w_1, w_2, \dots, w_9$).
+* **Training:** Through backpropagation, the network learns the best values for these parameters based on the data.
+* **Versatility:** The network can learn to detect edges at any angle (45°, 70°, etc.) or even complex patterns that humans don't have names for.
+
+---
