@@ -53,7 +53,7 @@ To process high-resolution images effectively, we must use the **Convolution Ope
 
 # The Convolution Operation: Edge Detection
 
-The **Convolution Operation** is a fundamental building block of CNNs. It allows a network to process images and identify structural features like edges, which are later combined to recognize complex objects.
+The **Convolution Operation** is a fundamental building block of CNNs. It allows a network to process images and identify structural features like edges (edges are the locations in an image where there is a sharp change in brightness or color intensity), which are later combined to recognize complex objects.
 
 ---
 
