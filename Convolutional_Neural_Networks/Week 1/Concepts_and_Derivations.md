@@ -335,3 +335,48 @@ The following notation is used to define the dimensions of a layer $l$:
 * **Vectorization:** When processing $m$ examples, the activations $A^{[l]}$ become a 4D tensor: $(m, n_H, n_W, n_c)$.
 
 ---
+
+# Example of a Deep Convolutional Neural Network
+
+A typical ConvNet takes an input image and transforms it through several layers of convolutions before "flattening" the data for a final classification.
+
+---
+
+## 1. Network Architecture Example
+In this example, we start with a small color image and apply three successive convolutional layers:
+
+| Layer | Input Size | Filter ($f$) | Stride ($s$) | Padding ($p$) | Filters ($n_c$) | Output Size |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Input** | $39 \times 39 \times 3$ | - | - | - | - | - |
+| **Conv 1**| $39 \times 39 \times 3$ | $3 \times 3$ | 1 | 0 (Valid) | 10 | $37 \times 37 \times 10$ |
+| **Conv 2**| $37 \times 37 \times 10$| $5 \times 5$ | 2 | 0 (Valid) | 20 | $17 \times 17 \times 20$ |
+| **Conv 3**| $17 \times 17 \times 20$| $5 \times 5$ | 2 | 0 (Valid) | 40 | $7 \times 7 \times 40$ |
+
+
+
+---
+
+## 2. Final Classification (The "Flattening" Step)
+To actually make a prediction (e.g., "Is this a cat?"), we must convert the 3D volume into a 1D vector:
+1.  **Unroll the volume:** The final $7 \times 7 \times 40$ output contains **1,960** total units ($7 \times 7 \times 40 = 1960$).
+2.  **Flattening:** We stretch these numbers out into one long column (a vector).
+3.  **Softmax/Logistic Regression:** This vector is fed into a final layer that outputs a probability (e.g., 0.98 for "Cat").
+
+
+
+---
+
+## 3. General Trends in ConvNets
+As you look at modern ConvNet architectures, you will notice a consistent pattern as you go deeper into the network:
+* **Height ($n_H$) and Width ($n_W$):** These typically **decrease**, especially when using strides greater than 1 or "valid" convolutions.
+* **Number of Channels ($n_c$):** These typically **increase** (e.g., moving from 3 color channels to 10, 20, and finally 40 feature channels).
+
+---
+
+## 4. Types of Layers in a ConvNet
+While we have focused on the **Convolutional (Conv)** layer, a full network usually contains three distinct types of building blocks:
+1.  **Conv (Convolutional):** Extracts features using filters.
+2.  **Pool (Pooling):** Used to reduce the spatial size of the representation (coming next).
+3.  **FC (Fully Connected):** Standard neural network layers used at the very end of the network.
+
+---
