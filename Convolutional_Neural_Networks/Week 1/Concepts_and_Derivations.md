@@ -274,14 +274,9 @@ If you have:
 * **Input:** $n \times n \times n_c$
 * **Filter:** $f \times f \times n_c$
 * **Number of Filters:** $n_c'$
+* The third dimension (the "3" in $6 \times 6 \times 3$) is often called **Channels** or **Depth**. 
 
 The **Output** will be: 
 $$(n - f + 1) \times (n - f + 1) \times n_c'$$
-
----
-
-## 4. Terminology Note: Channels vs. Depth
-The third dimension (the "3" in $6 \times 6 \times 3$) is often called **Channels** or **Depth**. 
-* The instructor prefers **Channels** because "Depth" is usually used to describe how many layers are in the entire neural network, which can be confusing.
 
 ---
