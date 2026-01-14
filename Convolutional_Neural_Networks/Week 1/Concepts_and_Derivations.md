@@ -438,3 +438,45 @@ Pooling is performed **independently** on each channel.
 $$\left\lfloor \frac{n + 2p - f}{s} + 1 \right\rfloor$$
 
 ---
+
+# Building a Full Convolutional Network (ConvNet)
+
+A full network is essentially a "sandwich" of different layers that starts with an image and ends with a classification (a prediction).
+
+---
+
+## 1. The Full Tour: From Pixels to Digits
+We start with a **32 x 32 x 3** color image. The process follows a specific pattern:
+
+| Stage | Type | Dimensions | What's Happening? |
+| :--- | :--- | :--- | :--- |
+| **Input** | Image | $32 \times 32 \times 3$ | The raw pixels of a handwritten digit. |
+| **Layer 1** | **Conv1** | $28 \times 28 \times 6$ | 6 filters find basic edges. |
+| | **Pool1** | $14 \times 14 \times 6$ | Max Pooling shrinks the image size by half. |
+| **Layer 2** | **Conv2** | $10 \times 10 \times 16$ | 16 filters find more complex shapes. |
+| | **Pool2** | $5 \times 5 \times 16$ | Image is shrunk again to a very small size. |
+| **Layer 3** | **Flatten** | $400 \times 1$ | We "unroll" the 3D cube into a long list of numbers. |
+| | **FC3** | $120$ units | A standard neural layer (Fully Connected). |
+| **Layer 4** | **FC4** | $84$ units | Another standard layer to refine the clues. |
+| **Output** | **Softmax**| $10$ units | A final probability for digits 0-9. |
+
+
+
+---
+
+## 2. Key Observations and Trends
+When looking at the whole "sandwich," you’ll notice two very consistent "AI Rules":
+
+1. **Shrinking Space:** As you go deeper, the **Height and Width ($n_H, n_W$)** always go down ($32 \rightarrow 14 \rightarrow 5$).
+2. **Increasing Clues:** As you go deeper, the **Number of Channels ($n_c$)** usually goes up ($3 \rightarrow 6 \rightarrow 16$). We are trading spatial detail for "clue detail."
+
+---
+
+## 3. Where is the Math Hiding?
+One of the most surprising things about ConvNets is where the "memory" (parameters) is stored:
+
+* **Conv Layers:** Have very few parameters. They use the same tiny "flashlight" (filter) over the whole image, which is very efficient.
+* **Pooling Layers:** Have **zero** parameters. They are just a simple "find the biggest number" rule.
+* **Fully Connected (FC) Layers:** Have **TONS** of parameters. Most of the computer's memory is used here at the very end to link the "clues" to the final "decision."
+
+---
