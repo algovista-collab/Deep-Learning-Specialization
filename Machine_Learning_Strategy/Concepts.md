@@ -77,4 +77,3 @@ This replaces multi-stage pipelines with a single, large neural network.
 * **Use Case:** Excellent for Speech Recognition and Machine Translation; less effective for tasks where the pipeline can be broken into clearer, smaller sub-tasks with limited data.
 
 ---
-Would you like me to create a template for the Error Analysis table mentioned in section 4?```
