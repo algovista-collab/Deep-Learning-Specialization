@@ -126,3 +126,81 @@ for t in range(1, num_iterations):
     v_corrected = v / (1 - beta**t)
     
     # Update parameters using v_corrected...
+```
+---
+
+# Gradient Descent with Momentum
+
+**Momentum** is an optimization technique that improves the speed and efficiency of the standard gradient descent algorithm. By adding a "memory" of past gradients, it helps the optimizer take larger, more confident steps in the right direction.
+
+## 1. The Intuition
+In standard Gradient Descent, the steps might oscillate wildly in the vertical direction (high variance) while making slow progress in the horizontal direction. 
+
+Momentum uses **Exponentially Weighted Averages** to:
+* **Dampen Oscillations:** Average out the vertical steps toward zero.
+* **Accelerate Learning:** Accumulate velocity in the horizontal direction toward the minimum.
+
+
+
+---
+
+## 2. The Algorithm
+
+On each iteration $t$, given a mini-batch:
+
+### Step 1: Compute Gradients
+Compute the standard gradients $dW$ and $db$ on the current mini-batch:
+$$dW = \frac{\partial J}{\partial W}, \quad db = \frac{\partial J}{\partial b}$$
+
+### Step 2: Update Velocity (EWA)
+Update the moving average of the gradients. This "velocity" term ($V$) provides the momentum:
+$$V_{dW} = \beta V_{dW} + (1 - \beta) dW$$
+$$V_{db} = \beta V_{db} + (1 - \beta) db$$
+
+### Step 3: Update Parameters
+Instead of using the raw gradients ($dW, db$), we use the velocity terms to update the weights and biases:
+$$W = W - \alpha V_{dW}$$
+$$b = b - \alpha V_{db}$$
+
+---
+
+## 3. Hyperparameters
+
+* **$\alpha$ (Learning Rate):** The size of the step.
+* **$\beta$ (Momentum Coefficient):** * Typically set to **0.9**. 
+    * This effectively averages the last $\frac{1}{1-0.9} = 10$ gradients.
+    * $\beta = 0$ reduces the algorithm back to standard Gradient Descent.
+
+---
+
+## 4. Why it works: The "Bowl" Analogy
+Imagine a ball rolling down a bowl. 
+* The gradient ($dW$) provides **acceleration** (the slope of the bowl).
+* The velocity ($V_{dW}$) represents the **momentum** the ball has built up.
+* $\beta$ acts like **friction**, preventing the ball from oscillating infinitely and helping it settle at the bottom.
+
+
+
+---
+
+## 5. Implementation (Python)
+
+```python
+# Initialization
+v_dw = 0
+v_db = 0
+beta = 0.9
+
+# Optimization Loop
+for t in range(num_iterations):
+    # 1. Compute gradients via backprop
+    dw, db = backward_propagation(X_batch, Y_batch, parameters)
+    
+    # 2. Update velocities
+    v_dw = (beta * v_dw) + (1 - beta) * dw
+    v_db = (beta * v_db) + (1 - beta) * db
+    
+    # 3. Update parameters
+    W = W - alpha * v_dw
+    b = b - alpha * v_db
+```
