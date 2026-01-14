@@ -204,3 +204,80 @@ for t in range(num_iterations):
     W = W - alpha * v_dw
     b = b - alpha * v_db
 ```
+
+---
+
+# RMSProp and Learning Rate Decay
+
+## 1. RMSProp (Root Mean Square Propagation)
+
+RMSProp is an optimization technique that speeds up gradient descent by adjusting the learning rate for each parameter individually. It is particularly effective at dampening oscillations in the vertical direction while maintaining speed in the horizontal direction.
+
+### The Algorithm
+On iteration $t$, compute $dW$ and $db$ on the current mini-batch:
+
+1. **Update Squared Gradient Averages:**
+   We keep an exponentially weighted average of the *squares* of the gradients.
+   $$S_{dW} = \beta_2 S_{dW} + (1 - \beta_2) (dW)^2$$
+   $$S_{db} = \beta_2 S_{db} + (1 - \beta_2) (db)^2$$
+
+2. **Update Parameters:**
+   We divide the gradient by the square root of the average to "normalize" the update.
+   $$W := W - \alpha \frac{dW}{\sqrt{S_{dW}} + \epsilon}$$
+   $$b := b - \alpha \frac{db}{\sqrt{S_{db}} + \epsilon}$$
+
+> **Note:** $\epsilon$ (typically $10^{-8}$) is added to the denominator to prevent division by zero.
+
+
+
+### Why it works:
+* If $dW$ is very large (steep oscillations), $S_{dW}$ becomes large. Dividing by $\sqrt{S_{dW}}$ **slows down** the update in that direction.
+* If $dW$ is small, $S_{dW}$ is small, and the update remains **faster**.
+* This allows the algorithm to "dampen" the oscillations that usually prevent us from using a high learning rate.
+
+---
+
+## 2. Learning Rate Decay
+
+As an optimization algorithm nears the minimum of the cost function, a fixed learning rate $\alpha$ might cause the parameters to "overshoot" or wander around the minimum rather than converging exactly. 
+
+**Learning Rate Decay** slowly reduces $\alpha$ over time to allow for finer steps as training progresses.
+
+### Mathematical Formula:
+$$\alpha = \frac{\alpha_0}{1 + \text{decay\_rate} \times \text{epoch\_num}}$$
+
+* **$\alpha_0$:** Initial learning rate.
+* **$\text{decay\_rate}$:** A hyperparameter controlling how fast the rate drops.
+* **$\text{epoch\_num}$:** The current full pass through the dataset.
+
+
+
+### Other Common Decay Methods:
+* **Exponential Decay:** $\alpha = 0.95^{\text{epoch\_num}} \cdot \alpha_0$
+* **Discrete Staircase:** Reducing $\alpha$ by half every $k$ epochs.
+* **Manual Decay:** Manually lowering the rate when the user notices the cost has plateaued.
+
+---
+
+## 3. Python Implementation
+
+```python
+# Initialization
+s_dw, s_db = 0, 0
+beta2 = 0.999 # Typical value for RMSProp
+epsilon = 1e-8
+
+for epoch in range(num_epochs):
+    # Update alpha using decay
+    alpha = initial_alpha / (1 + decay_rate * epoch)
+    
+    for t in range(num_mini_batches):
+        dw, db = backward_propagation(X_batch, Y_batch)
+        
+        # Update Squared Gradients
+        s_dw = (beta2 * s_dw) + (1 - beta2) * (dw**2)
+        s_db = (beta2 * s_db) + (1 - beta2) * (db**2)
+        
+        # Update Parameters
+        W = W - alpha * (dw / (np.sqrt(s_dw) + epsilon))
+        b = b - alpha * (db / (np.sqrt(s_db) + epsilon))
