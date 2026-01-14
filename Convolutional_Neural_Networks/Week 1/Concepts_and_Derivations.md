@@ -280,3 +280,58 @@ The **Output** will be:
 $$(n - f + 1) \times (n - f + 1) \times n_c'$$
 
 ---
+
+# One Layer of a Convolutional Neural Network
+
+A single layer in a CNN is more than just a convolution. It follows a similar logic to a standard neural network layer ($z = Wa + b$, followed by an activation), but with a 3D structure.
+
+---
+
+## 1. From Convolution to Layer
+To create a full CNN layer, the following steps are performed:
+1.  **Linear Operation (Convolution):** The input $a^{[l-1]}$ is convolved with filters $W^{[l]}$.
+2.  **Add Bias ($b$):** A single real number (bias) is added to every element of the convolution output.
+3.  **Non-linearity ($g$):** An activation function, typically **ReLU**, is applied to the result.
+4.  **Stacking:** The outputs from all filters are stacked to form the activation volume $a^{[l]}$ for the next layer.
+
+
+
+---
+
+## 2. Parameter Efficiency
+One of the most powerful features of CNNs is **Parameter Sharing**. 
+* **Example:** If you have 10 filters of size $3 \times 3 \times 3$:
+  * Each filter has $27$ weights + $1$ bias = $28$ parameters.
+  * Total parameters = $28 \times 10 = \mathbf{280}$.
+* **Key Benefit:** This number remains **280** regardless of whether the input image is $64 \times 64$ or $1000 \times 1000$. This prevents overfitting and saves memory.
+
+---
+
+## 3. Summary of Notation
+The following notation is used to define the dimensions of a layer $l$:
+
+### Hyperparameters
+* $f^{[l]}$ : Filter size
+* $s^{[l]}$ : Stride
+* $p^{[l]}$ : Padding
+* $n_c^{[l]}$ : Number of filters
+
+### Dimensions
+| Component | Dimension Formula |
+| :--- | :--- |
+| **Input** | $n_H^{[l-1]} \times n_W^{[l-1]} \times n_c^{[l-1]}$ |
+| **Output Height/Width** | $n_{H,W}^{[l]} = \lfloor \frac{n_{H,W}^{[l-1]} + 2p - f}{s} + 1 \rfloor$ |
+| **Output Volume** | $n_H^{[l]} \times n_W^{[l]} \times n_c^{[l]}$ |
+| **Weights ($W^{[l]}$)** | $f^{[l]} \times f^{[l]} \times n_c^{[l-1]} \times n_c^{[l]}$ |
+| **Biases ($b^{[l]}$)** | $1 \times 1 \times 1 \times n_c^{[l]}$ |
+
+
+
+---
+
+## 4. Key Takeaways
+* **Channels Match:** The number of channels in a filter must match the number of channels in its input volume ($n_c^{[l-1]}$).
+* **Output Depth:** The "depth" (channels) of the output volume is determined by the **number of filters** used in that layer.
+* **Vectorization:** When processing $m$ examples, the activations $A^{[l]}$ become a 4D tensor: $(m, n_H, n_W, n_c)$.
+
+---
