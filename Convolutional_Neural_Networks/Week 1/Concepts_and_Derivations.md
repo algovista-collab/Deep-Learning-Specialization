@@ -47,9 +47,6 @@ If we use a standard **Fully Connected Network** on a 1-megapixel image:
 ## 4. The Path Forward: Convolutions
 To process high-resolution images effectively, we must use the **Convolution Operation**. This allows the network to:
 * Reduce the total number of parameters.
-
-<img width="635" height="447" alt="image" src="https://github.com/user-attachments/assets/19cb4c5d-4387-41aa-8479-ee86f105ad19" />
-
 * Perform operations like **Edge Detection** to extract meaningful features.
 
 <img width="927" height="456" alt="image" src="https://github.com/user-attachments/assets/f9db576c-8489-42d1-96ed-1a02791a080a" />
