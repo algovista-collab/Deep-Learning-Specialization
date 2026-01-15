@@ -61,3 +61,62 @@ The VGG network simplified CNN design by using a very uniform and systematic arc
 1.  **Spatial Shrinkage:** Height ($n_H$) and Width ($n_W$) decrease as you go deeper.
 2.  **Channel Growth:** The number of channels ($n_C$) increases as you go deeper.
 3.  **Standard Pattern:** $\text{Conv} \to \text{Pool} \to \dots \to \text{FC} \to \text{Softmax}$.
+
+<img width="1046" height="511" alt="image" src="https://github.com/user-attachments/assets/49d612c7-da57-48ad-bbc7-3819f530d1d6" />
+
+<img width="1768" height="976" alt="image" src="https://github.com/user-attachments/assets/4c5e78f0-d8ed-46ce-8502-59dcdeef112d" />
+
+# Residual Networks (ResNets) Summary
+
+ResNets were introduced to address the **vanishing and exploding gradient** problems that make very deep "plain" networks difficult to train.
+
+---
+
+## 1. The Residual Block
+The fundamental building block of a ResNet is the **Residual Block**. In a standard "plain" network, activations flow linearly from one layer to the next. In a ResNet, we introduce a **shortcut** or **skip connection**.
+
+
+
+### The Math Behind the Block
+In a standard network, the path is:
+1. $z^{[l+1]} = W^{[l+1]}a^{[l]} + b^{[l+1]}$
+2. $a^{[l+1]} = g(z^{[l+1]})$
+3. $z^{[l+2]} = W^{[l+2]}a^{[l+1]} + b^{[l+2]}$
+4. $a^{[l+2]} = g(z^{[l+2]})$
+
+In a **Residual Block**, we inject $a^{[l]}$ directly into the calculation before the second ReLU nonlinearity:
+$$a^{[l+2]} = g(z^{[l+2]} + a^{[l]})$$
+
+---
+
+## 2. Plain Networks vs. ResNets
+A ResNet is constructed by stacking multiple residual blocks together.
+
+* **Plain Network:** A standard neural network where layers are stacked strictly one after another.
+* **ResNet:** A network where every few layers (usually two) include a skip connection that allows information to bypass the main path.
+
+---
+
+## 3. Performance and Training Error
+The inventors (Kaiming He et al.) observed a critical difference in how deep networks behave during training:
+
+### Plain Networks
+* **Theory:** Deeper networks should theoretically have lower training error.
+* **Reality:** As depth increases, training error eventually starts to **increase**. This is because deep plain networks are significantly harder to optimize due to gradient issues.
+
+### ResNets
+* **Empirical Result:** Even as the number of layers exceeds 100 (and even up to 1,000), the training error continues to **decrease**.
+* **Impact:** Skip connections make it much easier for the optimization algorithm (like Gradient Descent) to learn the identity function, ensuring that adding depth doesn't hurt performance.
+
+
+
+---
+
+## Key Takeaways
+| Feature | Plain Network | Residual Network (ResNet) |
+| :--- | :--- | :--- |
+| **Path** | Linear only | Main path + Shortcut (Skip Connection) |
+| **Optimization** | Becomes harder with depth | Remains effective even with 100+ layers |
+| **Gradient Issues** | High risk of vanishing/exploding | Significantly mitigated by skip connections |
+| **Training Error** | Increases after a certain depth | Continues to decrease with more depth |
+
