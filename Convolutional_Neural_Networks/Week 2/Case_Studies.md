@@ -120,3 +120,58 @@ The inventors (Kaiming He et al.) observed a critical difference in how deep net
 | **Gradient Issues** | High risk of vanishing/exploding | Significantly mitigated by skip connections |
 | **Training Error** | Increases after a certain depth | Continues to decrease with more depth |
 
+# Why ResNets Work: Intuition and Implementation
+
+The primary reason ResNets outperform "plain" networks is their ability to maintain performance even as depth increases by making it easy for the network to learn an **identity function**.
+
+---
+
+## 1. The "Identity Function" Intuition
+In a standard deep network, it is surprisingly difficult for layers to learn to simply pass an input through without changing it (the identity function). In a ResNet, this becomes the "default" behavior.
+
+### Mathematical Proof
+Given a residual block:
+$$a^{[l+2]} = g(z^{[l+2]} + a^{[l]})$$
+Expanding $z^{[l+2]}$:
+$$a^{[l+2]} = g(W^{[l+2]}a^{[l+1]} + b^{[l+2]} + a^{[l]})$$
+
+If we use **L2 Regularization** (weight decay), the weights $W^{[l+2]}$ and bias $b^{[l+2]}$ will shrink toward zero. If $W^{[l+2]} = 0$ and $b^{[l+2]} = 0$:
+$$a^{[l+2]} = g(0 + a^{[l]}) = a^{[l]}$$
+*(Assuming $g$ is a ReLU and $a^{[l]}$ is non-negative from a previous ReLU)*.
+
+**Conclusion:** It is very easy for a residual block to learn $a^{[l+2]} = a^{[l]}$. This ensures that adding layers never hurts the training performance, as the network can simply "skip" layers that aren't useful.
+
+---
+
+## 2. Managing Dimensions ($W_s$)
+For the addition $z^{[l+2]} + a^{[l]}$ to work, the vectors must have the same dimensions.
+
+* **Same Convolutions:** Most ResNets use "same" padding to keep dimensions consistent across layers, making the shortcut addition straightforward.
+* **Dimension Mismatch:** If dimensions differ (e.g., after a pooling layer), a linear projection matrix $W_s$ is used:
+    $$a^{[l+2]} = g(z^{[l+2]} + W_s a^{[l]})$$
+    * $W_s$ can be a set of **learnable parameters** to resize $a^{[l]}$.
+    * $W_s$ can be a **fixed matrix** used for zero-padding.
+
+---
+
+## 3. ResNet Architecture on Images
+The transition from a "Plain" network to a "ResNet" involves adding skip connections every two (or more) convolutional layers.
+
+
+
+### Key Structural Patterns:
+* **Convolution Layers:** Primarily $3 \times 3$ filters with "same" padding.
+* **Periodic Downsampling:** Occasional pooling layers or strided convolutions reduce height and width.
+* **Channel Doubling:** When spatial dimensions are halved, the number of filters is typically doubled to preserve representational capacity.
+* **Final Layers:** Ends with Global Average Pooling followed by a Softmax output.
+
+---
+
+## Summary Comparison
+
+| Concept | Plain Network | Residual Network |
+| :--- | :--- | :--- |
+| **Learning Identity** | Difficult; requires specific weight values | Easy; happens naturally when weights are small |
+| **Depth Limit** | Training error increases with extreme depth | Can scale to 100+ or 1,000+ layers |
+| **Connection Type** | Sequential only | Sequential + Skip Connections |
+| **Performance** | Performance plateaus then degrades | Performance continues to improve or stays stable |
