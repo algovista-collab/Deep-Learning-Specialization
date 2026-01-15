@@ -53,3 +53,8 @@ MobileNet v2 is like a lung:
 * **Exhale (Projection):** "Squeeze" the most important info back into a tiny package for the next step.
 
 This cycle allows the network to be smarter (higher accuracy) while staying extremely small (lower memory).
+
+<img width="1801" height="897" alt="image" src="https://github.com/user-attachments/assets/5ae873e5-65dd-45b5-b2d6-034c1a3ea658" />
+
+<img width="992" height="482" alt="image" src="https://github.com/user-attachments/assets/3c12baac-fd3c-4fea-a042-55475e4be4cc" />
+
