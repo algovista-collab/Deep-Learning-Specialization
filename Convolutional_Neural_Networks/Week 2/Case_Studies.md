@@ -394,3 +394,30 @@ $$432 (\text{Depthwise}) + 240 (\text{Pointwise}) = \mathbf{672}$$
 The ratio of cost is approximately: 
 $$\frac{1}{n_c'} + \frac{1}{f^2}$$
 Since the number of filters ($n_c'$) is usually large and filters ($f$) are often $3 \times 3$, the cost is reduced to roughly **1/9th** of the original!
+
+# The Evolution of Convolutional Neural Network Architectures
+
+This table summarizes the foundational architectures that transitioned Computer Vision from basic digit recognition to high-performance mobile AI.
+
+| Stage | Architecture | The "Big Idea" | Problem Solved |
+| :--- | :--- | :--- | :--- |
+| **The Pioneers** | **LeNet / AlexNet / VGG** | Basic stacks of Conv and Pool layers. | Established that stacking layers allows AI to "see" complex features. |
+| **The Shortcut** | **ResNet** | **Skip Connections.** Allows data to bypass layers. | Solved "Vanishing Gradients," allowing for 100+ layer networks. |
+| **The Squasher** | **1x1 Convolutions** | **Channel Reduction.** Shrinks the depth of a volume. | Reduced computational cost and added non-linearity without changing image size. |
+| **The Parallelist** | **Inception** | **Multi-scale Filters.** Uses $1\times1$, $3\times3$, and $5\times5$ at once. | Captures patterns of different sizes simultaneously using "bottleneck" layers. |
+| **The Mobile Era** | **MobileNet** | **Depthwise Separable Convolutions.** | Split spatial and channel math to make networks 10x faster for phones. |
+
+---
+
+## Architecture Visual Cheat Sheet
+
+### 1. The ResNet Skip Connection
+Allows the gradient to flow through the "shortcut," preventing the signal from dying out in very deep networks.
+
+
+### 2. The Inception Module
+Instead of choosing one filter size, it uses all of them and stacks the results.
+
+
+### 3. MobileNet Depthwise Separable Conv
+Splits a standard 3D convolution into two lighter steps: a spatial "Depthwise" step and a channel-mixing "Pointwise" step.
