@@ -331,3 +331,66 @@ Since the original paper, the architecture has evolved:
 | **Channel Concatenation** | How the outputs of the parallel filters are joined together. |
 | **Side Branches** | Extra "mini-outputs" used only during training to keep the network on track. |
 | **Meme Origin** | The name "Inception" comes from the "We need to go deeper" meme. |
+
+# MobileNets: Depthwise Separable Convolutions
+
+The goal of MobileNet is to achieve high performance in computer vision while significantly reducing the **computational cost** (multiplications) compared to standard convolutions.
+
+---
+
+## 1. Normal Convolution (The Baseline)
+In a standard convolution, a filter looks at **all channels** and **spatial areas** simultaneously.
+
+* **Input:** $6 \times 6 \times 3$
+* **Filter:** $3 \times 3 \times 3$ (The filter depth must match the input depth)
+* **Operation:** To calculate one output pixel, you do $3 \times 3 \times 3 = 27$ multiplications.
+* **Total Cost:** $(\text{Filter Size}) \times (\text{Filter Positions}) \times (\text{Number of Filters})$
+* **Example:** $(3 \times 3 \times 3) \times (4 \times 4) \times 5 = \mathbf{2,160}$ multiplications.
+
+
+
+---
+
+## 2. Depthwise Separable Convolution
+This approach splits the normal convolution into **two separate steps** to save math.
+
+### Step A: Depthwise Convolution
+Instead of one filter looking at all channels, we use **one filter per channel**.
+* **Process:** If you have 3 input channels (Red, Green, Blue), you use three separate $3 \times 3$ filters. Each filter only slides over its assigned channel.
+* **Output:** The result is an intermediate volume ($4 \times 4 \times 3$) where the channels haven't "mixed" yet.
+* **Cost:** $(3 \times 3) \times (4 \times 4) \times 3 = \mathbf{432}$ multiplications.
+
+
+
+### Step B: Pointwise Convolution
+Now we mix the channels using a **$1 \times 1$ convolution** (which you learned about earlier).
+* **Process:** Apply 5 filters of size $1 \times 1 \times 3$ to the intermediate volume.
+* **Output:** This produces the final $4 \times 4 \times 5$ output.
+* **Cost:** $(1 \times 1 \times 3) \times (4 \times 4) \times 5 = \mathbf{240}$ multiplications.
+
+---
+
+## 3. The "Efficiency" Winner
+By splitting the task, the total cost for Depthwise Separable Convolution is:
+$$432 (\text{Depthwise}) + 240 (\text{Pointwise}) = \mathbf{672}$$
+
+**Comparison:**
+* **Normal Conv:** 2,160 ops
+* **MobileNet Conv:** 672 ops
+* **Savings:** In this example, it is **~3x cheaper**. In real-world models with many channels, it is often **10x cheaper**.
+
+---
+
+## 4. Summary Table
+
+| Feature | Normal Convolution | Depthwise Separable Conv |
+| :--- | :--- | :--- |
+| **Steps** | 1 Step | 2 Steps (Depthwise + Pointwise) |
+| **Mixing** | Mixes spatial and channel info at once | Splits spatial and channel mixing |
+| **Efficiency** | Computationally Heavy | High Efficiency (Mobile friendly) |
+| **Cost Formula** | $f \cdot f \cdot n_c \cdot n_{out} \cdot n_{out} \cdot n_c'$ | $(f \cdot f \cdot n_c \cdot n_{out}^2) + (n_c \cdot n_{out}^2 \cdot n_c')$ |
+
+### Key Intuition
+The ratio of cost is approximately: 
+$$\frac{1}{n_c'} + \frac{1}{f^2}$$
+Since the number of filters ($n_c'$) is usually large and filters ($f$) are often $3 \times 3$, the cost is reduced to roughly **1/9th** of the original!
