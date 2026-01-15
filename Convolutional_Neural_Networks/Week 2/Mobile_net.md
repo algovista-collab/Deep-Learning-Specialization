@@ -108,3 +108,5 @@ To make the scaling effective, you need a high-quality starting point. The resea
 
 ### Key Takeaway:
 EfficientNet allows you to be **computationally responsible**. You can achieve state-of-the-art accuracy with a model that is often **8x smaller** and **6x faster** than traditional models (like ResNet or Inception) because it scales its dimensions in perfect balance.
+
+<img width="940" height="478" alt="image" src="https://github.com/user-attachments/assets/3f1f93bb-cb3a-4e37-b9a9-3104acf5cc07" />
