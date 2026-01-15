@@ -278,3 +278,56 @@ To solve the cost problem, Inception uses **$1 \times 1$ convolutions** as a "Bo
 
 ### Key Takeaway
 The Inception module allows for a very deep and wide network by using **parallelism** to capture diverse features and **bottleneck layers** to keep the math fast and efficient.
+
+# The Inception Network (GoogLeNet) Summary
+
+The **Inception Network** is essentially a vertical stack of the Inception modules we've discussed, with a few clever additions to handle depth and training stability.
+
+---
+
+## 1. Refining the Inception Module
+Before stacking, there is one final tweak to the Max Pooling branch within the module. 
+
+* **Problem:** Even with "Same" padding, Max Pooling preserves the full depth (channels) of the input. If the input has 192 channels, the pooling output also has 192, which would dominate the concatenated output.
+* **Solution:** A **1x1 Convolution** is placed *after* the Max Pooling layer to "shrink" its channels (e.g., from 192 down to 32) before concatenation.
+
+
+
+---
+
+## 2. The Full GoogLeNet Architecture
+The complete network, famously called **GoogLeNet** (a tribute to LeNet), is built by repeating the Inception module.
+
+* **Repeated Modules:** The network consists of several Inception modules stacked on top of each other.
+* **Dimensionality Reduction:** Occasionally, standard Max Pooling layers are placed *between* Inception modules to reduce the height and width of the data as it moves deeper.
+* **The End:** The network concludes with Global Average Pooling and a Softmax layer for classification.
+
+
+
+---
+
+## 3. Side Branches (Auxiliary Classifiers)
+One of the most unique features of GoogLeNet is the inclusion of "Side Branches."
+
+* **What they are:** These are mini-networks (a few FC layers and a Softmax) that branch off from the middle of the main architecture.
+* **Purpose:** They calculate a loss based on intermediate features. 
+* **Benefits:** 1.  **Combats Vanishing Gradients:** It ensures the middle layers are getting a strong "signal" about the final goal during training.
+    2.  **Regularization:** It helps prevent the network from overfitting.
+
+---
+
+## 4. Summary of Inception Versions
+Since the original paper, the architecture has evolved:
+* **Inception v2 & v3:** Focused on further computational efficiency and better factorizing convolutions.
+* **Inception v4:** Integrated **ResNet** skip connections for even better performance.
+
+---
+
+### Key Takeaways
+
+| Feature | Description |
+| :--- | :--- |
+| **GoogLeNet** | The official name of the Inception v1 network. |
+| **Channel Concatenation** | How the outputs of the parallel filters are joined together. |
+| **Side Branches** | Extra "mini-outputs" used only during training to keep the network on track. |
+| **Meme Origin** | The name "Inception" comes from the "We need to go deeper" meme. |
