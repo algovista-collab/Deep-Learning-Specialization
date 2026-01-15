@@ -421,3 +421,5 @@ Instead of choosing one filter size, it uses all of them and stacks the results.
 
 ### 3. MobileNet Depthwise Separable Conv
 Splits a standard 3D convolution into two lighter steps: a spatial "Depthwise" step and a channel-mixing "Pointwise" step.
+
+<img width="1801" height="897" alt="image" src="https://github.com/user-attachments/assets/5ae873e5-65dd-45b5-b2d6-034c1a3ea658" />
