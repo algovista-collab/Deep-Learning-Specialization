@@ -175,3 +175,49 @@ The transition from a "Plain" network to a "ResNet" involves adding skip connect
 | **Depth Limit** | Training error increases with extreme depth | Can scale to 100+ or 1,000+ layers |
 | **Connection Type** | Sequential only | Sequential + Skip Connections |
 | **Performance** | Performance plateaus then degrades | Performance continues to improve or stays stable |
+
+# 1x1 Convolutions (Network in Network) Summary
+
+A **1x1 Convolution** might seem like a simple multiplication, but when applied to volumes with multiple channels, it becomes a sophisticated tool for dimensionality reduction and non-linear computation.
+
+---
+
+## 1. How It Works
+While a 1x1 convolution on a single-channel image is just a scalar multiplication, its behavior changes when applied to a multi-channel volume (e.g., $6 \times 6 \times 32$).
+
+
+
+* **Pixel-wise Fully Connected Layer:** You can think of a 1x1 convolution as applying a fully connected neural network to each individual "pixel" or spatial position ($H \times W$) across all channels ($N_C$).
+* **The Computation:** For each spatial position, the filter takes the input numbers (one from each channel), multiplies them by its own weights, adds a bias, and applies a **ReLU nonlinearity**.
+* **Result:** If you have 32 input channels and use 16 filters of size $1 \times 1 \times 32$, you transform a $6 \times 6 \times 32$ volume into a $6 \times 6 \times 16$ volume.
+
+---
+
+## 2. Key Applications
+
+### A. Dimensionality Reduction (Channel Shrinking)
+Unlike Pooling layers, which shrink the **height and width**, 1x1 convolutions are used to shrink the **number of channels ($N_C$)**.
+* **Example:** To transform a $28 \times 28 \times 192$ volume into $28 \times 28 \times 32$, you simply apply 32 filters of size $1 \times 1 \times 192$.
+* **Benefit:** This reduces the computational burden for subsequent layers.
+
+
+
+### B. Adding Non-Linearity
+Even if you don't want to change the number of channels, applying a 1x1 convolution (where input channels = output channels) adds an extra layer of non-linearity (ReLU) to the network. This allows the model to learn more complex patterns without significantly increasing the parameter count.
+
+---
+
+## 3. Comparison with Pooling
+
+| Feature | Pooling Layers (Max/Avg) | 1x1 Convolution |
+| :--- | :--- | :--- |
+| **Primary Goal** | Shrink Height ($H$) and Width ($W$) | Change/Shrink Number of Channels ($N_C$) |
+| **Parameters** | None (Static operation) | Learnable Weights and Biases |
+| **Non-Linearity** | Usually none | Includes ReLU activation |
+
+---
+
+## Summary of Influence
+The "Network in Network" idea (from the paper by Lin et al.) has been highly influential in modern architectures:
+* It is a core building block of the **Inception Network** (GoogleNet).
+* It is used in **ResNet** "bottleneck" layers to keep computation manageable.
