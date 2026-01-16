@@ -297,3 +297,51 @@ Understanding these layers is crucial for Neural Style Transfer because:
 | **Deep (L4, L5)** | High-level | Object Parts (eyes, legs), Complex Entities (dogs, cars) |
 
 ---
+
+# Visualizing What Deep ConvNets Learn
+
+This summary explores the hierarchical nature of Convolutional Neural Networks (ConvNets), explaining how they transition from identifying simple pixels to recognizing complex objects.
+
+---
+
+## 🛠 Visualization Methodology
+To understand what a specific **hidden unit** (neuron) is computing:
+1.  **Scan the Training Set:** Pass the dataset through the network (e.g., AlexNet).
+2.  **Maximize Activation:** Identify the nine image patches that cause a specific unit to fire at its highest level.
+3.  **Analyze Receptive Fields:** * **Early Layers:** Units see only a small portion of the image (small patches).
+    * **Deeper Layers:** Units have a larger "receptive field," allowing them to see more global structures.
+
+---
+
+## 🏗 The Layer Hierarchy
+
+
+
+### 🔹 Layer 1: The Basics
+* **Focus:** Extremely simple visual primitives.
+* **Detections:** Edges at specific angles, lines, and basic color gradients (e.g., a green vertical edge or an orange-brown shade).
+
+### 🔹 Layer 2: Textures and Shapes
+* **Focus:** More complex patterns by combining Layer 1 outputs.
+* **Detections:** Vertical textures, rounded shapes, and thin parallel lines.
+
+### 🔹 Layer 3: Complex Patterns
+* **Focus:** Larger, irregular textures and early object parts.
+* **Detections:** Honeycomb patterns, square shapes, and the initial outlines of dogs, cars, or people.
+
+
+
+### 🔹 Layer 4 & 5: High-Level Concepts
+* **Layer 4:** Becomes a specific category detector (e.g., dog faces, water, or bird legs).
+* **Layer 5:** Detects more sophisticated and varied objects.
+    * **Examples:** Sophisticated "dog detectors" (capable of seeing many breeds), keyboards, text-like textures, and flowers.
+
+---
+
+## 💡 Key Takeaway
+ConvNets learn a **hierarchical representation** of the world:
+> **Edges** $\rightarrow$ **Textures** $\rightarrow$ **Patterns** $\rightarrow$ **Parts** $\rightarrow$ **Objects**
+
+This intuition is foundational for implementing **Neural Style Transfer**, as it allows us to separate the "content" (found in deeper layers) from the "style" (captured across various layers).
+
+---
