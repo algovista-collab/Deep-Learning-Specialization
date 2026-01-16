@@ -273,3 +273,60 @@ To transition from a small set of activations back to a larger image size, the n
 | **Granularity** | Coarse | Fine/High Precision |
 | **Architecture** | Standard ConvNet / YOLO | U-Net (Contract + Expand) |
 | **Primary Goal** | Locate and identify | Define exact shape and boundary |
+
+# Summary: Transpose Convolution
+
+The transpose convolution (sometimes called "deconvolution") is a fundamental operation in semantic segmentation. It provides a way to **upsample** activations—taking a small input and blowing it up into a larger output.
+
+---
+
+## 1. Goal: Increasing Spatial Dimensions
+In a standard convolution, we typically reduce a $6 \times 6$ input to a $4 \times 4$ output. A transpose convolution does the opposite:
+* **Example Input:** $2 \times 2$
+* **Example Output:** $4 \times 4$ (using a $3 \times 3$ filter, stride of 2, and padding of 1).
+
+
+
+---
+
+## 2. The Calculation Process
+Unlike a regular convolution where the filter is placed over the input, in a transpose convolution, the input value **weights** the filter, which is then placed on the output.
+
+### Step-by-Step Mechanical Walkthrough:
+1.  **Weighting:** Take a single scalar from the input (e.g., the value `2` in the top-left).
+2.  **Multiplication:** Multiply that scalar by every element in the $3 \times 3$ filter.
+3.  **Placement:** Place the resulting $3 \times 3$ weighted matrix into the output grid.
+4.  **Striding:** Move to the next input value. Because the **stride ($s=2$)** is applied to the output, you shift the placement of the next $3 \times 3$ matrix by 2 pixels.
+5.  **Overlap & Sum:** In areas where the shifted filter placements overlap, you **sum** the values together.
+6.  **Padding:** If padding ($p=1$) is specified, the outermost borders of the resulting calculation are cropped out to reach the final target dimension.
+
+
+
+---
+
+## 3. Parameters of Transpose Convolution
+The size of the output is determined by the same variables as a regular convolution, but the relationship is inverted:
+* **$n_{in}$**: Input size (e.g., 2)
+* **$f$**: Filter size (e.g., 3)
+* **$s$**: Stride (e.g., 2)
+* **$p$**: Padding (e.g., 1)
+
+This allows the U-Net to gradually reconstruct the original $H \times W$ of the image from the low-resolution "bottleneck" activations.
+
+---
+
+## 4. Why Use Transpose Convolution?
+While there are other ways to resize images (like bilinear interpolation), transpose convolution is **learnable**.
+* The values inside the filter are **parameters** that the network learns through backpropagation.
+* This allows the network to learn the most effective way to "fill in the blanks" when expanding the image, leading to much more accurate segmentation maps.
+
+---
+
+## 5. Summary Table
+
+| Feature | Regular Convolution | Transpose Convolution |
+| :--- | :--- | :--- |
+| **Spatial Effect** | Usually decreases (Downsampling) | Increases (Upsampling) |
+| **Input Usage** | Sliding window over input | Scalar weights the filter |
+| **Output Usage** | Sum of element-wise product | Weighted filter is "pasted" and summed |
+| **U-Net Role** | The "Encoder" (Context) | The "Decoder" (Localization) |
