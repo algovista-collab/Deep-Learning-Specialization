@@ -234,3 +234,5 @@ Despite the speed increase, this method still faces one major hurdle:
 | **Layers** | Fully Connected (Fixed size) | Convolutional (Flexible size) |
 | **Computation** | Highly redundant | Highly shared/efficient |
 | **Output** | Single classification per pass | A grid of classifications |
+
+<img width="1027" height="555" alt="image" src="https://github.com/user-attachments/assets/0f439f49-3b96-4e31-be5e-d18b9dbb01e3" />
