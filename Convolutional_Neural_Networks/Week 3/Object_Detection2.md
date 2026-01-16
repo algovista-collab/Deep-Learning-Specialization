@@ -165,3 +165,56 @@ Because the network predicts two boxes for every single grid cell (18 boxes for 
 | **Inference** | A single forward pass through a ConvNet to generate the output volume. |
 | **Cleanup** | Apply $p_c$ thresholding followed by per-class Non-Max Suppression. |
 | **Result** | Optimized bounding boxes with high confidence and correct labels. |
+
+# Summary: Region Proposals (R-CNN)
+
+While YOLO handles detection in a single forward pass, the **Region Proposal** family of algorithms (R-CNN) uses a "propose-then-classify" strategy. Although often slower than YOLO, it has been highly influential in computer vision.
+
+---
+
+## 1. The Core Idea: Selective Search
+The primary drawback of simple sliding windows is that the algorithm wastes time classifying empty background regions. R-CNN addresses this by:
+* Running a **segmentation algorithm** to find "blobs" or regions that look like they *might* be objects.
+* Selecting roughly **2,000 regions** (called region proposals).
+* Running a ConvNet only on these 2,000 regions rather than every possible window.
+
+
+
+---
+
+## 2. The R-CNN Evolution
+Over time, several iterations were developed to solve the speed issues of the original algorithm:
+
+| Algorithm | Key Innovation | Characteristics |
+| :--- | :--- | :--- |
+| **R-CNN** | Propose regions $\to$ classify one by one. | Very slow; uses external segmentation. |
+| **Fast R-CNN** | Propose regions $\to$ classify all via **convolutional implementation**. | Much faster than R-CNN; similar to convolutional sliding windows. |
+| **Faster R-CNN** | Uses a **Region Proposal Network (RPN)** to suggest regions. | Fully neural network based; faster than Fast R-CNN but usually slower than YOLO. |
+
+
+
+---
+
+## 3. How R-CNN Localizes
+Like YOLO, R-CNN does not just rely on the initial proposed box.
+* The network outputs a class label (Pedestrian, Car, etc.).
+* It also outputs **bounding box parameters ($b_x, b_y, b_h, b_w$)** to refine the initial "blob" into a tight, accurate rectangle around the object.
+
+---
+
+## 4. R-CNN vs. YOLO: Philosophical Differences
+* **Two-Step (R-CNN):** First find *where* objects might be, then find *what* they are. This is often more accurate but computationally heavier.
+* **One-Step (YOLO):** Find *where* and *what* simultaneously in one pass. This is generally faster and more suited for real-time applications.
+
+> **Perspective:** Many researchers (including Andrew Ng) believe that "one-step" frameworks like YOLO are more promising for the long term because of their end-to-end efficiency.
+
+---
+
+## 5. Summary Table
+
+| Feature | R-CNN Family | YOLO |
+| :--- | :--- | :--- |
+| **Detection Philosophy** | Region Proposals (Selective) | Grid-based (Global) |
+| **Speed** | Slow to Moderate | Fast (Real-time) |
+| **Accuracy** | Often higher in localization | High (improving rapidly) |
+| **Components** | Multiple stages (RPN + Classifier) | Single pipeline |
