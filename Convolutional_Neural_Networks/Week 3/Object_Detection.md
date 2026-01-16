@@ -178,3 +178,59 @@ While straightforward, the basic Sliding Windows algorithm has a major flaw: **C
 | **Step 4: Scale** | Repeat with larger window sizes to find objects of different sizes. |
 
 > **Next Step:** To solve the efficiency problem, we can implement this process **convolutionally**, allowing us to process the entire image in a single pass rather than cropping and running regions independently.
+
+<img width="1860" height="928" alt="image" src="https://github.com/user-attachments/assets/94b50184-a47d-4b58-a0c6-4ce17fbb0bc7" />
+
+# Summary: Convolutional Implementation of Sliding Windows
+
+The basic sliding windows algorithm is inefficient because it performs independent forward passes for every cropped region. The **Convolutional Implementation** optimizes this by converting fully connected layers into convolutional layers, allowing the network to process an entire image in a single pass.
+
+---
+
+## 1. Converting Fully Connected (FC) to Convolutional Layers
+To process images of any size, the traditional FC layers must be replaced with equivalent convolutional operations.
+
+* **The Problem:** FC layers require a fixed-size input vector.
+* **The Solution:** Use filters of the same dimension as the input volume.
+    * If the input to an FC layer is $5 \times 5 \times 16$, we can use **400 filters** of size $5 \times 5$ (each filter is $5 \times 5 \times 16$ to match the depth).
+    * This results in a $1 \times 1 \times 400$ volume instead of a flat vector of 400 nodes.
+    * Subsequent FC layers are replaced by $1 \times 1$ convolutions.
+
+
+
+---
+
+## 2. The Convolutional Sliding Windows Algorithm
+When the network is fully convolutional, we no longer need to crop the image. Instead, we feed the **entire larger image** into the network.
+
+### Example: 14x14 ConvNet on a 16x16 Image
+1.  **Original Method:** To run a 14x14 window on a 16x16 image with a stride of 2, you would need **4 separate passes** (top-left, top-right, bottom-left, bottom-right).
+2.  **Convolutional Method:** Feed the 16x16 image once. The network will output a **2x2 volume**. 
+    * Each of the 4 cells in that 2x2 output corresponds exactly to the result the network would have given for one of the four 14x14 crops.
+
+
+
+---
+
+## 3. Advantages: Computational Efficiency
+The primary benefit is **Shared Computation**. 
+* In the sequential approach, overlapping regions are re-calculated from scratch for every window.
+* In the convolutional approach, all overlapping regions share the same feature maps and activations in the early layers.
+* This turns thousands of expensive forward passes into **one single forward pass** over a larger volume.
+
+---
+
+## 4. Key Limitations
+Despite the speed increase, this method still faces one major hurdle:
+* **Bounding Box Accuracy:** Because the windows move by a fixed stride (determined by the pooling layers), the detected box might not perfectly align with the object. It is limited by the "grid" of the output volume.
+
+---
+
+## 5. Summary Comparison
+
+| Feature | Sequential Sliding Windows | Convolutional Sliding Windows |
+| :--- | :--- | :--- |
+| **Input** | Multiple small crops ($N$ passes) | Single large image (1 pass) |
+| **Layers** | Fully Connected (Fixed size) | Convolutional (Flexible size) |
+| **Computation** | Highly redundant | Highly shared/efficient |
+| **Output** | Single classification per pass | A grid of classifications |
