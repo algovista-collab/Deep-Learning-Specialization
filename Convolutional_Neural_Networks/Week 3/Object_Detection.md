@@ -236,3 +236,56 @@ Despite the speed increase, this method still faces one major hurdle:
 | **Output** | Single classification per pass | A grid of classifications |
 
 <img width="1027" height="555" alt="image" src="https://github.com/user-attachments/assets/0f439f49-3b96-4e31-be5e-d18b9dbb01e3" />
+
+# Summary: The YOLO (You Only Look Once) Algorithm
+
+The YOLO algorithm is a breakthrough in object detection because it provides high accuracy in bounding box prediction while maintaining real-time processing speeds. It solves the limitations of sliding windows by treating detection as a single regression problem.
+
+---
+
+## 1. The Grid Approach
+Instead of sliding a window across the image, YOLO divides the input image into a grid (e.g., $3 \times 3$, though $19 \times 19$ is more common in practice).
+
+
+
+* **Midpoint Assignment:** Each object in the image is assigned to **exactly one** grid cell—the one that contains the object's midpoint.
+* **Target Vector ($y$):** For each grid cell, the network predicts an 8-dimensional vector:
+    $$y = [p_c, b_x, b_y, b_h, b_w, c_1, c_2, c_3]^T$$
+* **Output Volume:** For a $3 \times 3$ grid, the network's output is a $3 \times 3 \times 8$ volume. This allows the network to predict all objects and their locations in a **single forward pass**.
+
+---
+
+## 2. Precise Bounding Box Coordinates
+Unlike sliding windows, which are limited by stride and fixed window shapes, YOLO predicts the bounding box coordinates ($b_x, b_y, b_h, b_w$) as continuous values relative to the grid cell:
+
+* **$(b_x, b_y)$**: The center of the object. These values are between $0$ and $1$ because the midpoint must stay within the assigned cell.
+* **$(b_h, b_w)$**: The height and width of the object. These are expressed as a fraction of the grid cell's dimensions. These **can** be greater than $1$ if the object spans multiple cells.
+
+
+
+---
+
+## 3. Advantages of YOLO
+| Feature | Benefit |
+| :--- | :--- |
+| **Precision** | Outputs exact coordinates and arbitrary aspect ratios, not just fixed boxes. |
+| **Speed** | It is a **convolutional implementation** with highly shared computation, making it fast enough for real-time video. |
+| **Global Context** | The network "looks" at the whole image at once, helping it reduce background errors. |
+
+---
+
+## 4. Key Implementation Details
+* **Single Pass:** You feed a $100 \times 100 \times 3$ (or similar) image into a ConvNet and get a $3 \times 3 \times 8$ (or $19 \times 19 \times 8$) output volume immediately.
+* **Handling Empty Cells:** Cells with no object midpoint have $p_c = 0$ and the rest of the values are "don't cares."
+* **Limitations:** In its basic form, the algorithm struggles if a single grid cell contains the midpoints of two different objects.
+
+---
+
+## 5. Summary Table: YOLO vs. Sliding Windows
+
+| Feature | Sliding Windows (Convolutional) | YOLO |
+| :--- | :--- | :--- |
+| **Output** | A grid of classification labels | A volume of labels + precise coordinates |
+| **Box Shape** | Fixed by the window size | Predicted (can be any rectangle) |
+| **Efficiency** | High (but localization is coarse) | High (with fine localization) |
+| **Real-time** | Possible, but less accurate | Excellent / Industry Standard |
