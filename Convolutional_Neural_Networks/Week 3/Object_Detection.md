@@ -68,3 +68,58 @@ The loss function is calculated differently depending on the value of $p_c$. Usi
 
 ## 6. Key Takeaway
 By modifying a standard Convolutional Neural Network (ConvNet) to output a vector of real numbers (regression) rather than just a single class probability, we can teach the network to localize objects with high precision.
+
+# Landmark Detection
+
+Landmark detection is an extension of the localization concept. Instead of just outputting a bounding box, the neural network is trained to output the specific $(x, y)$ coordinates of important points (landmarks) in an image.
+
+---
+
+## 1. Defining Landmarks
+Landmarks are specific interest points used to define the shape, pose, or features of an object. 
+* **Face Recognition/Filters:** Detecting corners of the eyes, edges of the mouth, or the silhouette of the jawline.
+* **Pose Estimation:** Detecting key joints such as the shoulders, elbows, wrists, and knees.
+
+
+
+---
+
+## 2. Network Architecture
+To implement landmark detection, the final layer of the **ConvNet** is modified to output multiple real-numbered units representing the coordinates of $N$ landmarks.
+
+### Example: Facial Landmark Detection
+If you define **64 landmarks** for a face, the network output vector $y$ would consist of:
+* **$p_c$**: Is there a face? (1 bit)
+* **$l_{1x}, l_{1y}$**: Coordinates of landmark 1.
+* **...**
+* **$l_{64x}, l_{64y}$**: Coordinates of landmark 64.
+
+**Total Output Units:** $1 + (64 \times 2) = 129$ units.
+
+---
+
+## 3. Key Requirements for Training
+For the network to learn effectively, two conditions must be met:
+
+1.  **Labeled Dataset:** You need a large training set where human annotators have manually identified the $(x, y)$ coordinates for every landmark on every image.
+2.  **Consistent Identity:** Landmarks must remain consistent across the entire dataset. For example, $l_{1}$ must *always* represent the inner corner of the left eye, regardless of the person's pose or lighting.
+
+---
+
+## 4. Practical Applications
+Landmark detection is a foundational technology for several modern features:
+* **Augmented Reality (AR):** Snapchat/Instagram filters that accurately place crowns, glasses, or masks on a moving face.
+* **Emotion Recognition:** Analyzing the position of landmarks around the mouth and eyes to determine if a person is smiling, frowning, or surprised.
+* **Body Pose Estimation:** Used in sports analysis, gesture control, or computer graphics to track human movement.
+
+
+
+---
+
+## 5. Summary Table
+
+| Feature | Bounding Box (Localization) | Landmark Detection |
+| :--- | :--- | :--- |
+| **Output Type** | 4 numbers ($b_x, b_y, b_h, b_w$) | $2 \times N$ numbers ($l_{ix}, l_{iy}$) |
+| **Granularity** | Coarse (Region of interest) | Fine (Specific key points) |
+| **Primary Use** | Object presence and size | Shape, pose, and expression analysis |
