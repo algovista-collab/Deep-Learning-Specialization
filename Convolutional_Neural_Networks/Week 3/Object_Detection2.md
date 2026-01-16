@@ -218,3 +218,58 @@ Like YOLO, R-CNN does not just rely on the initial proposed box.
 | **Speed** | Slow to Moderate | Fast (Real-time) |
 | **Accuracy** | Often higher in localization | High (improving rapidly) |
 | **Components** | Multiple stages (RPN + Classifier) | Single pipeline |
+
+# Summary: Semantic Segmentation
+
+Semantic segmentation takes object detection a step further by providing a pixel-level map of an image. Instead of just identifying an object or drawing a box, the algorithm labels every single pixel with a category.
+
+---
+
+## 1. What is Semantic Segmentation?
+The goal is to provide a dense prediction where each pixel is assigned a class label. This allows for a precise outline of objects rather than a rough rectangle.
+
+
+
+### Key Applications:
+* **Self-Driving Cars:** Identifying the exact "drivable surface" of the road versus sidewalks or obstacles.
+* **Medical Imaging:** Automatically segmenting organs (lungs, heart) or tumors in X-rays and MRI scans to assist in surgical planning and diagnosis.
+    
+* **Augmented Reality:** Precisely separating a person from their background to apply virtual effects.
+
+---
+
+## 2. The Task: Per-Pixel Classification
+If we are segmenting a car from a background, the network doesn't just output one $y$ label; it outputs a matrix of labels.
+* **Binary Case:** 1 for "Car", 0 for "Not Car".
+* **Multi-Class Case:** 1 for "Car", 2 for "Building", 3 for "Road", etc.
+
+The output is essentially a **segmentation map**—a matrix with the same height and width as the input image, where each entry is the predicted class for that pixel.
+
+---
+
+## 3. High-Level Architecture: The U-Net
+Standard ConvNets (used for classification) typically reduce the spatial dimensions (height and width) while increasing depth (channels). To produce a pixel-level map, the network must "blow up" these dimensions back to the original size.
+
+### The Two Phases:
+1.  **Contraction (Downsampling):** A typical ConvNet path that captures the "what" (context) by reducing spatial dimensions.
+2.  **Expansion (Upsampling):** A path that captures the "where" (localization) by increasing spatial dimensions.
+
+
+
+---
+
+## 4. Key Operation: Transpose Convolution
+To transition from a small set of activations back to a larger image size, the network uses a specialized operation called **Transpose Convolution**. 
+* **Standard Convolution:** Usually makes the image smaller.
+* **Transpose Convolution:** Increases the height and width of the activation volumes, allowing the network to reconstruct the full-size segmentation map.
+
+---
+
+## 5. Summary Comparison
+
+| Feature | Object Detection | Semantic Segmentation |
+| :--- | :--- | :--- |
+| **Output Type** | Bounding Box $(b_x, b_y, b_h, b_w)$ | Pixel-level Mask (Matrix) |
+| **Granularity** | Coarse | Fine/High Precision |
+| **Architecture** | Standard ConvNet / YOLO | U-Net (Contract + Expand) |
+| **Primary Goal** | Locate and identify | Define exact shape and boundary |
