@@ -107,3 +107,61 @@ While anchor boxes significantly improve detection, some rare scenarios remain d
 | **Assignment** | Midpoint $\to$ Grid Cell | Midpoint $\to$ Cell + Highest IoU Anchor |
 | **Output size** | Grid $\times$ Grid $\times$ 8 | Grid $\times$ Grid $\times$ (Anchors $\times$ 8) |
 | **Benefit** | Simple | Handles overlap & allows specialization |
+
+# Summary: The Complete YOLO Algorithm
+
+The YOLO (You Only Look Once) algorithm integrates all the concepts discussed—grid systems, bounding box regression, IoU, non-max suppression, and anchor boxes—into a single, high-performance object detection pipeline.
+
+---
+
+## 1. Constructing the Training Set
+For a 3x3 grid with two anchor boxes and three classes (Pedestrian, Car, Motorcycle), each grid cell is represented by a 16-dimensional vector.
+
+**The Target Vector ($y$):**
+$$y = \begin{bmatrix} p_c & b_x & b_y & b_h & b_w & c_1 & c_2 & c_3 & p_c & b_x & b_y & b_h & b_w & c_1 & c_2 & c_3 \end{bmatrix}^T$$
+
+
+
+### Training Data Assignment:
+* **Background Cells:** If no object midpoint falls in a cell, $p_c=0$ for both anchor boxes; other values are "don't cares."
+* **Object Cells:** The object is assigned to the specific anchor box that has the **highest IoU** with the object's ground-truth shape.
+* **Volume:** In practice, a 19x19 grid with 5 anchors would result in a $19 \times 19 \times (5 \times 8) = 19 \times 19 \times 40$ output volume.
+
+---
+
+## 2. Making Predictions
+When a test image is fed into the trained ConvNet, it outputs the full volume (e.g., $3 \times 3 \times 16$). 
+* Every cell—even those with no objects—will output values. 
+* Where $p_c$ is low, the remaining 14 numbers (bounding box and class predictions) are treated as noise and ignored.
+* Where $p_c$ is high, the network provides the specific coordinates and the class of the detected object relative to the grid cell.
+
+---
+
+## 3. Post-Processing: Non-Max Suppression (NMS)
+Because the network predicts two boxes for every single grid cell (18 boxes for a 3x3 grid), many redundant detections will exist.
+
+1.  **Probability Thresholding:** Discard all boxes where the predicted $p_c$ is below a set limit (e.g., 0.6).
+2.  **Class-Independent NMS:** For each class (Pedestrian, Car, Motorcycle):
+    * Run the Non-Max Suppression algorithm independently.
+    * This ensures that overlapping detections of a "Car" don't suppress a nearby "Pedestrian."
+3.  **Final Output:** The remaining boxes are the final localized detections.
+
+
+
+---
+
+## 4. Key Takeaways
+* **Speed:** YOLO is exceptionally fast because it requires only one forward pass through the ConvNet to see every object in the image.
+* **Specialization:** Anchor boxes allow different parts of the output vector to specialize in different shapes (e.g., tall/skinny vs. short/wide).
+* **Robustness:** It is one of the most effective algorithms in modern computer vision, combining global context with local precision.
+
+---
+
+## 5. Summary Table: YOLO Pipeline
+
+| Phase | Key Action |
+| :--- | :--- |
+| **Training** | Assign objects to Grid Cells + Anchor Boxes based on midpoint and IoU. |
+| **Inference** | A single forward pass through a ConvNet to generate the output volume. |
+| **Cleanup** | Apply $p_c$ thresholding followed by per-class Non-Max Suppression. |
+| **Result** | Optimized bounding boxes with high confidence and correct labels. |
