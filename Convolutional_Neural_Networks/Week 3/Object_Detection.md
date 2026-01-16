@@ -1,4 +1,4 @@
-# Summary: Object Localization Fundamentals
+# Object Localization Fundamentals
 
 Object localization is the bridge between simple image classification and complex object detection. It involves not only identifying **what** an object is but also **where** it is located within the image.
 
@@ -123,3 +123,58 @@ Landmark detection is a foundational technology for several modern features:
 | **Output Type** | 4 numbers ($b_x, b_y, b_h, b_w$) | $2 \times N$ numbers ($l_{ix}, l_{iy}$) |
 | **Granularity** | Coarse (Region of interest) | Fine (Specific key points) |
 | **Primary Use** | Object presence and size | Shape, pose, and expression analysis |
+
+# Summary: Sliding Windows Detection
+
+The Sliding Windows Detection algorithm is a technique used to transition from simple image classification to full object detection by reusing a classifier across different regions of an image.
+
+---
+
+## 1. The Training Process
+Before performing detection, you must first train a Convolutional Neural Network (ConvNet) on a specialized dataset:
+* **Dataset Style:** Closely cropped images.
+* **Positive Examples:** Images where a car (or target object) is centered and occupies nearly the entire frame.
+* **Negative Examples:** Images of anything else (roads, trees, buildings) that do not contain the target object.
+* **Output:** A binary classification ($0$ or $1$) indicating the presence of the object.
+
+---
+
+## 2. The Sliding Windows Step
+Once the ConvNet is trained, it is used to analyze a test image (which is much larger than the training crops) through the following steps:
+
+1.  **Select a Window Size:** Choose a small rectangular region.
+2.  **Slide the Window:** Move this window across the image using a specific **stride** (step size).
+3.  **Classify Each Region:** Crop each region bounded by the window, resize it to the ConvNet's input size, and run it through the network.
+4.  **Repeat with Scaling:** After the first pass, increase the window size and repeat the sliding process to account for objects that appear larger (closer to the camera).
+
+
+
+---
+
+## 3. Challenges and Disadvantages
+While straightforward, the basic Sliding Windows algorithm has a major flaw: **Computational Cost**.
+
+| Factor | Impact |
+| :--- | :--- |
+| **Stride Size** | A large stride is fast but lacks accuracy/localization; a small stride is accurate but requires processing thousands of crops. |
+| **Network Complexity** | ConvNets are computationally "expensive." Running one hundreds or thousands of times on a single image is extremely slow. |
+| **Redundancy** | Overlapping windows re-calculate many of the same pixel features repeatedly. |
+
+---
+
+## 4. Historical Context
+* **Pre-Neural Network Era:** Researchers used simpler, hand-engineered features (like HOG) and linear classifiers. Because these were "cheap" to compute, sliding windows were a viable and popular method.
+* **Modern Era:** Because deep ConvNets are significantly more complex, the sequential sliding window approach is generally considered **infeasible** for real-time applications without further optimization.
+
+---
+
+## 5. Summary Table
+
+| Step | Action |
+| :--- | :--- |
+| **Step 1: Training** | Train a ConvNet on closely cropped car/non-car images. |
+| **Step 2: Windows** | Pick a window size and slide it across the test image. |
+| **Step 3: Prediction** | Input each window crop into the ConvNet. |
+| **Step 4: Scale** | Repeat with larger window sizes to find objects of different sizes. |
+
+> **Next Step:** To solve the efficiency problem, we can implement this process **convolutionally**, allowing us to process the entire image in a single pass rather than cropping and running regions independently.
