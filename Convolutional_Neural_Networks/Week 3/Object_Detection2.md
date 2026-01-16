@@ -77,6 +77,7 @@ Instead of predicting one set of parameters per cell, you pre-define a set of sh
 The output vector $y$ is expanded to include predictions for every anchor box. If you have 2 anchor boxes and 3 classes, the vector doubles in size.
 
 **The Label Vector Structure:**
+
 $$y = \begin{bmatrix} \text{Anchor Box 1 parameters} \\ \hline \text{Anchor Box 2 parameters} \end{bmatrix} = \begin{bmatrix} p_c \\ b_x \\ b_y \\ b_h \\ b_w \\ c_1 \\ c_2 \\ c_3 \\ \hline p_c \\ b_x \\ b_y \\ b_h \\ b_w \\ c_1 \\ c_2 \\ c_3 \end{bmatrix}$$
 
 * **New Output Volume:** For a $3 \times 3$ grid with 2 anchors, the output becomes $3 \times 3 \times 16$ (or $3 \times 3 \times 2 \times 8$).
