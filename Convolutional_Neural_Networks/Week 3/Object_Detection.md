@@ -289,3 +289,55 @@ Unlike sliding windows, which are limited by stride and fixed window shapes, YOL
 | **Box Shape** | Fixed by the window size | Predicted (can be any rectangle) |
 | **Efficiency** | High (but localization is coarse) | High (with fine localization) |
 | **Real-time** | Possible, but less accurate | Excellent / Industry Standard |
+
+# Summary: Intersection Over Union (IoU)
+
+Intersection Over Union (IoU) is a performance metric used to evaluate the accuracy of an object detection algorithm by measuring the overlap between the predicted bounding box and the ground-truth bounding box.
+
+---
+
+## 1. Defining the Metric
+IoU is calculated by dividing the area of overlap between two boxes by the total area covered by both boxes combined.
+
+**The Formula:**
+$$IoU = \frac{\text{Size of Intersection}}{\text{Size of Union}}$$
+
+* **Intersection:** The area where the predicted box and ground-truth box overlap (the "shared" area).
+* **Union:** The total area encompassed by both the predicted box and the ground-truth box.
+
+
+
+---
+
+## 2. Interpreting the Score
+The IoU score ranges from **0 to 1**:
+* **1.0:** Perfect overlap (the boxes are identical).
+* **0.0:** No overlap at all.
+* **0.5 (Common Convention):** Typically, an object detection is considered "correct" if the $IoU \geq 0.5$.
+
+
+
+---
+
+## 3. Stringency and Thresholds
+While 0.5 is the standard threshold for evaluation in many competitions and research papers, it is an arbitrary human-chosen convention. 
+* **Higher Thresholds (0.6, 0.7):** Used if you want your algorithm to be more precise and stringent regarding localization.
+* **Lower Thresholds:** Rarely used, as a score below 0.5 usually indicates a poor match that is visually obvious to the human eye.
+
+---
+
+## 4. Why IoU Matters
+IoU is used for two primary purposes in object detection:
+1.  **Evaluation:** To count how many "True Positives" your model produces (mapping localization to a standard accuracy metric).
+2.  **Non-Max Suppression (NMS):** To identify and remove duplicate detections of the same object by checking if multiple predicted boxes have a high IoU with each other.
+
+---
+
+## 5. Summary Table
+
+| Term | Meaning | Visual Representation |
+| :--- | :--- | :--- |
+| **Intersection** | Area of overlap | The "AND" region |
+| **Union** | Total combined area | The "OR" region |
+| **Threshold** | Cut-off for "correctness" | Usually 0.5 |
+
