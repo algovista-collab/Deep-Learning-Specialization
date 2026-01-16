@@ -345,3 +345,45 @@ ConvNets learn a **hierarchical representation** of the world:
 This intuition is foundational for implementing **Neural Style Transfer**, as it allows us to separate the "content" (found in deeper layers) from the "style" (captured across various layers).
 
 ---
+
+# Neural Style Transfer: The Cost Function
+
+Neural Style Transfer (NST) is framed as an optimization problem where we generate a new image $G$ by minimizing a mathematical cost function.
+
+---
+
+## 🏗 The Problem Formulation
+To generate an image, the algorithm requires three inputs:
+1.  **Content Image ($C$):** The base image providing the layout/objects.
+2.  **Style Image ($S$):** The artwork providing the texture, colors, and brushstrokes.
+3.  **Generated Image ($G$):** The result, which starts as random noise and is iteratively updated.
+
+---
+
+## 📉 The Total Cost Function: $J(G)$
+The performance of the generated image is measured by a combined cost function:
+
+$$J(G) = \alpha J_{content}(C, G) + \beta J_{style}(S, G)$$
+
+### Components:
+* **Content Cost $J_{content}(C, G)$:** Measures how similar the content of $G$ is to the original image $C$.
+* **Style Cost $J_{style}(S, G)$:** Measures how similar the style of $G$ is to the style image $S$.
+* **Hyperparameters ($\alpha, \beta$):** These control the balance. 
+    * High $\alpha$ = Result looks more like the photo.
+    * High $\beta$ = Result looks more like the painting.
+
+---
+
+## 🔄 The Optimization Process
+
+
+
+Unlike training a standard neural network where we update **weights**, in NST we update the **pixel values** of the generated image $G$.
+
+1.  **Initialization:** $G$ is initialized as a white noise image (random pixel values).
+2.  **Define Cost:** Calculate $J(G)$ using a pre-trained ConvNet (like VGG).
+3.  **Gradient Descent:** Update pixels to minimize the cost:
+    $$G := G - \frac{\partial}{\partial G} J(G)$$
+4.  **Iteration:** As gradient descent runs, the white noise slowly evolves into a recognizable image that blends the structures of $C$ with the artistic flair of $S$.
+
+---
