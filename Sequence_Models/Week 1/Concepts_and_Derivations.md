@@ -243,7 +243,7 @@ Before training, you must process a large body of text (**corpus**):
 ### 2. RNN Architecture for Language Modeling
 In a language model, the input at time $t$ ($x^{<t>}$) is actually the **actual word** from the previous time step ($y^{<t-1>}$).
 
-
+<img width="1045" height="576" alt="image" src="https://github.com/user-attachments/assets/16b79847-c6c5-428c-a67c-35fcd7e5b1eb" />
 
 **The Training Flow:**
 1. **Time Step 1:** Input $x^{<1>} = \vec{0}$ (and $a^{<0>} = \vec{0}$). The model predicts $\hat{y}^{<1>}$ via a **Softmax** over the entire vocabulary (what is the first word?).
