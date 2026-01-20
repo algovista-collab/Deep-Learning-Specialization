@@ -77,3 +77,57 @@ If the model encounters a word not in its dictionary, it uses a special token:
 The objective is to learn a mapping $X \rightarrow Y$ where:
 * **Input ($X$):** A sequence of one-hot vectors.
 * **Output ($Y$):** A sequence of labels indicating if a word is a specific entity (e.g., a Person).
+
+---
+
+# Building a Recurrent Neural Network (RNN)
+
+Standard neural networks (Vanilla NNs) are poorly suited for sequence tasks like Named Entity Recognition (NER) for two main reasons:
+1. **Variable Lengths:** Inputs and outputs can have different lengths in different examples.
+2. **No Feature Sharing:** A standard NN doesn't share features learned at one position (e.g., "Harry" at the start) with other positions.
+
+---
+
+## 🏗️ RNN Architecture
+An RNN processes a sequence one step at a time, maintaining a "hidden state" (activation) that carries information from previous time steps to the current one.
+
+
+
+### Key Components
+* **$x^{<t>}$**: Input at time step $t$.
+* **$a^{<t>}$**: The hidden state (activation) at time $t$. It is computed using $x^{<t>}$ and the previous state $a^{<t-1>}$.
+* **$y^{<t>}$**: The prediction at time $t$.
+* **$a^{<0>}$**: The initial state, typically a vector of zeros.
+
+### Parameter Sharing
+Unlike standard NNs, an RNN uses the **same parameters** at every time step:
+* **$W_{ax}$**: Weights for the input-to-hidden connection.
+* **$W_{aa}$**: Weights for the hidden-to-hidden connection.
+* **$W_{ya}$**: Weights for the hidden-to-output connection.
+
+---
+
+## 🧪 Forward Propagation Equations
+
+For each time step $t$:
+1.  **Hidden State:** $a^{<t>} = g_1(W_{aa} a^{<t-1>} + W_{ax} x^{<t>} + b_a)$
+    * *Note: $g_1$ is usually `tanh` or `ReLU`.*
+2.  **Output:** $\hat{y}^{<t>} = g_2(W_{ya} a^{<t>} + b_y)$
+    * *Note: $g_2$ is usually `sigmoid` (binary) or `softmax`.*
+
+### Simplified Notation
+To make the math cleaner, we can stack the weight matrices into a single matrix $W_a$:
+$$a^{<t>} = g(W_a [a^{<t-1>}, x^{<t>}] + b_a)$$
+Where:
+* $W_a$ is $[W_{aa} | W_{ax}]$ (horizontal stacking).
+* $[a^{<t-1>}, x^{<t>}]$ is the vertical concatenation of the two vectors.
+
+---
+
+## ⚠️ Limitations of Basic RNNs
+The standard RNN described here is **unidirectional**. 
+* **The Problem:** It only uses information from the *past* to make a prediction. 
+* **Example:** In "Teddy Roosevelt was...", the model needs to see the word "Roosevelt" (future) to know if "Teddy" is a person or a toy.
+* **The Fix:** This is addressed later using **Bidirectional RNNs (BRNNs)**.
+
+---
