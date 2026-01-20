@@ -142,3 +142,89 @@ Because these models are trained on massive datasets (like the entire internet),
 It is important to remember that while 2D visualizations (like t-SNE) help humans see clusters, the **parallelogram relationship** (analogies) usually only holds true in the original high-dimensional space (e.g., 300D). t-SNE is a non-linear mapping that often breaks these linear mathematical relationships.
 
 ---
+
+# 🗄️ The Embedding Matrix (E)
+
+To implement word embeddings, we store all learned vectors in a single matrix, denoted as $E$. This matrix serves as a lookup table that maps high-dimensional one-hot vectors to dense, low-dimensional feature vectors.
+
+---
+
+## 1. Structure of the Matrix
+If we have a vocabulary of **10,000 words** and want each word to have **300 features**, the dimensions of our matrix $E$ will be:
+* **Rows:** 300 (The number of features/dimensions).
+* **Columns:** 10,000 (The size of the vocabulary $V$).
+
+Each column $j$ in the matrix represents the embedding vector $e_j$ for the $j^{th}$ word in the vocabulary.
+
+
+
+---
+
+## 2. The Retrieval Process (Matrix Multiplication)
+Mathematically, extracting the embedding for a specific word is represented as the multiplication of the Embedding Matrix $E$ by a one-hot vector $O$.
+
+### The Math:
+Let's say the word **"Orange"** is at index `6257` in our vocabulary:
+* $O_{6257}$ is a $(10000 \times 1)$ one-hot vector (all zeros, with a `1` at index 6257).
+* $E$ is a $(300 \times 10000)$ matrix.
+
+When you multiply them:
+$$E \cdot O_{6257} = e_{6257}$$
+
+Because the one-hot vector has only one non-zero element, this operation "selects" the $6257^{th}$ column of matrix $E$. The result is a **$(300 \times 1)$ dense vector** representing "Orange."
+
+---
+
+## 3. Implementation Note: Lookup vs. Multiplication
+While the math is written as a matrix multiplication ($E \cdot O$), in practice, this is highly inefficient because you are multiplying a lot of zeros.
+
+* **Theory:** $E \times \text{One-Hot Vector}$.
+* **Practice:** Most deep learning frameworks (like TensorFlow or PyTorch) use a **Lookup Layer**. This simply fetches the column by its index, which is computationally much faster than performing a full matrix multiplication.
+
+---
+
+# 🧠 Learning Word Embeddings: From Language Models to Simplified Contexts
+
+The development of word embeddings started with complex neural networks designed for language modeling and evolved into streamlined algorithms that focus on the relationship between "Context" and "Target" words.
+
+---
+
+## 1. The Neural Language Model (Bengio et al.)
+The foundational approach to learning embeddings involves training a neural network to predict the next word in a sequence.
+
+### How it Works:
+1. **Input (Context):** A sequence of words (e.g., "I want a glass of orange").
+2. **Embedding Lookup:** Each word's one-hot vector $O$ is multiplied by the embedding matrix $E$ to get a dense 300D vector $e$.
+3. **Fixed Window:** To handle varying sentence lengths, a fixed window (hyperparameter) is used—for example, only the previous 4 words.
+4. **Hidden Layer:** These 4 embedding vectors are concatenated (forming a 1,200D vector) and passed through a hidden layer with parameters $W^{(1)}, b^{(1)}$.
+5. **Softmax (Target):** The output layer is a Softmax over the entire 10,000-word vocabulary to predict the probability of the target word (e.g., "juice").
+
+
+
+---
+
+## 2. Why Embeddings Emerge
+The model learns meaningful embeddings because it is incentivized to group similar words together to minimize prediction error.
+* If the model sees both "orange juice" and "apple juice," it realizes that to predict "juice" correctly, the vectors for **orange** and **apple** must be similar.
+* This results in a feature-rich embedding matrix $E$ where semantically related words share similar coordinates.
+
+---
+
+## 3. Generalizing the "Context"
+Researchers discovered that if the primary goal is to learn the matrix $E$ (and not necessarily to build a perfect language model), the definition of "Context" can be simplified or altered:
+
+| Context Type | Description | Example (Target: "juice") |
+| :--- | :--- | :--- |
+| **Last $n$ words** | Standard language modeling. | "a glass of orange" |
+| **Window around word** | $n$ words to the left and $n$ to the right. | "glass of... to go" |
+| **Last 1 word** | Only the immediate predecessor. | "orange" |
+| **Nearby 1 word** | A random word within a local window. | "glass" |
+
+
+
+---
+
+## 4. Key Takeaway
+While complex models (using large windows and hidden layers) are great for language modeling, **simpler models** using a single nearby word as context (like the **Skip-gram** model) are remarkably effective at learning high-quality word embeddings while being much faster to train.
+
+---
