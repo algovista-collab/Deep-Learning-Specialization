@@ -363,3 +363,49 @@ An RNN processing a sequence of 1,000 steps is essentially a **1,000-layer deep 
 | **Vanishing Gradients** | Model fails to learn long-range patterns. | **Gated Units (GRU/LSTM)** (requires new architecture). |
 
 ---
+
+# Gated Recurrent Unit (GRU)
+
+The GRU is a modification to the standard RNN hidden layer that allows the model to selectively remember or forget information. This "memory" capability is what enables the network to handle long-range dependencies, like connecting a subject at the start of a sentence to a verb at the end.
+
+---
+
+## 🧠 The Concept of "The Cell" ($c^{<t>}$)
+
+In a GRU, we introduce a **memory cell** ($c^{<t>}$). 
+* For a GRU, $c^{<t>} = a^{<t>}$ (the cell value is the same as the output activation).
+* The cell acts as a "storage" for important information (e.g., whether the subject of a sentence is singular or plural).
+
+<img width="699" height="433" alt="Screenshot 2026-01-20 082754" src="https://github.com/user-attachments/assets/ad944b4d-d495-4310-aa86-f1a27734198b" />
+
+---
+
+## 🛠️ The GRU Equations (Simplified)
+
+To decide how to update the memory cell, the GRU uses a **Candidate Value** and an **Update Gate**.
+
+1.  **Candidate Value ($\tilde{c}^{<t>}$):** A potential new value for the cell, calculated using the current input and previous state.
+    $$\tilde{c}^{<t>} = \tanh(W_c [c^{<t-1>}, x^{<t>}] + b_c)$$
+2.  **Update Gate ($\Gamma_u$):** A value between $0$ and $1$ (using a sigmoid function) that decides whether to update the cell.
+    $$\Gamma_u = \sigma(W_u [c^{<t-1>}, x^{<t>}] + b_u)$$
+3.  **Final Cell Update ($c^{<t>}$):** This "gates" the information. If $\Gamma_u \approx 1$, we use the candidate. If $\Gamma_u \approx 0$, we keep the old value.
+    $$c^{<t>} = \Gamma_u * \tilde{c}^{<t>} + (1 - \Gamma_u) * c^{<t-1>}$$
+
+---
+
+## 🛠️ The Full GRU Unit
+
+The full version of the GRU includes an additional gate called the **Relevance Gate** ($\Gamma_r$), which determines how much of the *previous* state is relevant to calculating the *next* candidate.
+
+### Complete Formulas:
+* **Update Gate:** $\Gamma_u = \sigma(W_u [c^{<t-1>}, x^{<t>}] + b_u)$
+* **Relevance Gate:** $\Gamma_r = \sigma(W_r [c^{<t-1>}, x^{<t>}] + b_r)$
+* **Candidate:** $\tilde{c}^{<t>} = \tanh(W_c [\Gamma_r * c^{<t-1>}, x^{<t>}] + b_c)$
+* **Cell State:** $c^{<t>} = \Gamma_u * \tilde{c}^{<t>} + (1 - \Gamma_u) * c^{<t-1>}$
+
+---
+
+## 🌟 Why this solves Vanishing Gradients
+Because the update gate $\Gamma_u$ can be **very close to 0**, the network can choose to skip the update entirely ($c^{<t>} \approx c^{<t-1>}$). This creates a "shortcut" for the gradient to flow backwards through time without being multiplied by small numbers, effectively preserving the signal across hundreds of steps.
+
+---
