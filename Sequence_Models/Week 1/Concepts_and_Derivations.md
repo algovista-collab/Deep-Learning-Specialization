@@ -268,3 +268,50 @@ $$P(\text{cats, average, sleep}) = P(\text{cats}) \times P(\text{average} \mid \
 Each of these conditional probabilities is provided by one of the RNN's Softmax outputs.
 
 ---
+
+# Sampling Novel Sequences
+
+After training a language model, you can "sample" from it to generate new sequences. This allows the model to create original text, music, or other data based on the patterns it learned during training.
+
+---
+
+## 🎲 The Sampling Process
+
+To generate a sequence, the model predicts one step at a time, but instead of using a fixed target, it uses its own previous predictions as inputs for the next step.
+
+
+
+### Step-by-Step Procedure:
+1. **Initial Step:** Input $x^{<1>} = \vec{0}$ and $a^{<0>} = \vec{0}$.
+2. **First Word:** The Softmax layer outputs a probability distribution. Use `np.random.choice` to sample the first word ($\hat{y}^{<1>}$) from this distribution.
+3. **Looping:** * Take the word you just sampled ($\hat{y}^{<1>}$).
+    * Pass it as the input for the next time step ($x^{<2>} = \hat{y}^{<1>}$).
+    * Generate and sample the next word ($\hat{y}^{<2>}$).
+4. **Termination:** Keep going until the model generates an `<EOS>` (End of Sentence) token or until you reach a predefined number of time steps (e.g., 50 words).
+
+---
+
+## 🔠 Word-Level vs. Character-Level Models
+
+While we have focused on word-level models, you can also train an RNN at the character level.
+
+| Feature | Word-Level RNN | Character-Level RNN |
+| :--- | :--- | :--- |
+| **Vocabulary ($V$)** | Common words (e.g., "apple", "cat") | Individual chars (e.g., "a", "b", "!", " ") |
+| **Vocabulary Size** | Large (10,000 – 100,000+) | Small (~26–100 characters) |
+| **Unknown Words** | Uses `<UNK>` for rare words | No `<UNK>`; can construct any word |
+| **Sequence Length** | Shorter (fewer time steps) | Much longer (many more time steps) |
+| **Complexity** | Efficient and easy to train | Computationally expensive |
+| **Dependency** | Captures long-range context better | Struggles with long-range context |
+
+---
+
+## 🎭 Examples of Generated Text
+When you sample from a trained model, the output reflects the style of the training **corpus**:
+* **News-trained:** Generates text that mimics journalistic style (e.g., "The epidemic to be examined...").
+* **Shakespeare-trained:** Generates poetic, archaic-sounding text (e.g., "The mortal moon hath her eclipse...").
+
+---
+
+## ⚠️ Challenges in RNNs
+Standard RNNs suffer from **Vanishing Gradients**, making it hard for them to remember information from the beginning of a long sentence by the time they reach the end.
