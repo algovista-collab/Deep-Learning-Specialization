@@ -210,3 +210,228 @@ This concludes the primary technical content for Sequence Models. Over the past 
 * **Audio Applications:** Speech recognition, CTC cost functions, and trigger word systems.
 
 ---
+
+# Summary: Introduction to Transformer Networks
+
+The Transformer architecture has revolutionized Natural Language Processing (NLP) by moving away from sequential processing toward a highly parallelized, attention-based approach.
+
+---
+
+## 1. The Evolution of Sequence Models
+As sequence tasks became more complex, models evolved to better handle long-range dependencies, but often at the cost of computational efficiency.
+
+* **RNNs:** Suffered from vanishing gradients, making it hard to remember information from the start of a long sequence.
+* **GRUs & LSTMs:** Introduced "gates" to control information flow. While effective, they are **sequential**; you must compute word $t-1$ before you can compute word $t$.
+* **The Bottleneck:** This sequential nature prevents parallelization, making training on massive datasets slow.
+
+
+
+---
+
+## 2. The Transformer Innovation
+The Transformer network, introduced in the paper *"Attention is All You Need,"* changes the processing style from sequential to **parallel**.
+
+* **Parallelization:** Unlike RNNs, Transformers can ingest an entire sentence all at once.
+* **CNN-Style Speed:** It borrows the parallel processing power of Convolutional Neural Networks (CNNs) but applies it to text using **Attention Mechanisms**.
+* **Rich Representations:** It computes high-dimensional representations of words that account for the context of the entire sentence simultaneously.
+
+---
+
+## 3. Key Building Blocks
+To understand how a Transformer works, we look at two primary concepts:
+
+### A. Self-Attention
+For a sentence of five words, self-attention computes five representations ($A_1, A_2, \dots, A_5$) in parallel. It allows the model to look at other words in the same sentence to better understand the meaning of the current word.
+
+### B. Multi-Head Attention
+This is essentially a "for-loop" over the self-attention process. By running self-attention multiple times in parallel ("heads"), the model can focus on different types of relationships between words (e.g., one head focuses on grammar, another on entity relationships).
+
+
+
+---
+
+## 4. Comparison Table
+
+| Feature | RNN / LSTM / GRU | Transformer |
+| :--- | :--- | :--- |
+| **Processing** | Sequential (one-by-one) | Parallel (all at once) |
+| **Dependencies** | Hard to capture (long-range) | Easy to capture via Self-Attention |
+| **Training Speed** | Slower (sequential bottleneck) | Much faster (GPU-optimized) |
+| **Key Mechanism** | Gated Hidden States | Self-Attention & Multi-Head Attention |
+
+---
+
+# Summary: The Self-Attention Mechanism
+
+Self-attention is the core engine of the Transformer. It allows the model to look at the entire sentence simultaneously and decide which words provide the most relevant context for the word it is currently processing.
+
+---
+
+## 1. The Core Objective
+In standard word embeddings, a word like "Africa" has a fixed vector. Self-attention creates a **dynamic representation** ($A^{\langle t \rangle}$) by looking at surrounding words.
+* **Example:** In "Jane visited Africa in September," the representation for "Africa" ($A^{\langle 3 \rangle}$) will be enriched by the word "visited," signaling that Africa is being treated as a **destination**.
+
+---
+
+## 2. The Three Vectors: Query, Key, and Value
+For every word $i$ in the input, we compute three vectors by multiplying the word embedding $x^{\langle i \rangle}$ by learned weight matrices ($W^Q, W^K, W^V$):
+
+1.  **Query ($q^{\langle i \rangle}$):** "What am I looking for?" (e.g., *What is happening to Africa?*)
+2.  **Key ($k^{\langle i \rangle}$):** "What do I offer?" (e.g., *I am an action/verb.*)
+3.  **Value ($v^{\langle i \rangle}$):** "What information do I actually provide?" (The content used to build the new representation).
+
+
+
+---
+
+## 3. The Calculation Steps (The "Scaled Dot-Product")
+To compute the representation for a specific word (like $A^{\langle 3 \rangle}$ for "Africa"):
+
+1.  **Score:** Take the **dot product** of the current Query ($q^{\langle 3 \rangle}$) with the Keys of *every* word in the sentence ($k^{\langle 1 \rangle}, k^{\langle 2 \rangle}, \dots$).
+2.  **Scale:** Divide the scores by $\sqrt{d_k}$ (where $d_k$ is the dimension of the key) to prevent the gradients from exploding.
+3.  **Softmax:** Apply a softmax to turn these scores into probabilities (weights) that sum to 1.
+4.  **Weighted Sum:** Multiply these weights by the corresponding Value vectors ($v^{\langle 1 \rangle}, v^{\langle 2 \rangle}, \dots$) and sum them up.
+
+### The Formal Equation:
+$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+
+---
+
+## 4. Why is this better?
+* **Parallelization:** Unlike RNNs, which process word-by-word, these calculations for all words can happen at the exact same time.
+* **Contextual Nuance:** The model realizes that "Africa" in a travel context is different from "Africa" in a geography context by "attending" to different keys (like "visited" vs. "continent").
+
+
+
+---
+
+## 5. Summary Table
+
+| Component | Analogy | Function |
+| :--- | :--- | :--- |
+| **Query (Q)** | The Search | Asks a question about the current word's context. |
+| **Key (K)** | The Label | Matches against the query to determine relevance. |
+| **Value (V)** | The Content | The actual information passed to the next layer. |
+| **Softmax** | Filter | Decides which words to ignore and which to focus on. |
+
+---
+
+# Summary: Multi-Head Attention
+
+Multi-head attention is essentially running the self-attention mechanism multiple times in parallel. This allows the model to simultaneously process different types of relationships between words in a sentence.
+
+---
+
+## 1. The Core Intuition: "Asking Multiple Questions"
+While a single self-attention head might only be able to ask one question of the text (e.g., *"What is happening?"*), **Multi-Head Attention** allows the model to ask several questions at once:
+* **Head 1:** What is happening? (Focuses on verbs like *visite*)
+* **Head 2:** When is it happening? (Focuses on time like *septembre*)
+* **Head 3:** Who is involved? (Focuses on subjects like *Jane*)
+
+By combining the answers to these questions, the model builds a much richer representation of each word.
+
+
+
+---
+
+## 2. How it Works (The "For-Loop" Analogy)
+Conceptually, multi-head attention is like a for-loop over the self-attention process, though in practice, it is calculated in parallel.
+
+1.  **Independent Heads:** For each head $i$, we use a unique set of learned weight matrices ($W_i^Q, W_i^K, W_i^V$).
+2.  **Calculate Attention:** Each head calculates its own attention output ($A_i$) using the scaled dot-product formula.
+3.  **Concatenation:** All the individual head outputs ($head_1, head_2, \dots, head_h$) are concatenated together.
+4.  **Final Linear Projection:** The concatenated vector is multiplied by a final weight matrix ($W^O$) to produce the final output.
+
+
+
+---
+
+## 3. Key Parameters
+* **$h$ (Number of Heads):** A hyperparameter typically set to 8, 12, or 16.
+* **Parallelization:** Because no head depends on the output of another, all heads are computed simultaneously on the GPU, making the process extremely fast.
+
+---
+
+## 4. Summary Table
+
+| Feature | Self-Attention (Single Head) | Multi-Head Attention |
+| :--- | :--- | :--- |
+| **Questions Asked** | One (e.g., syntax or semantics). | Many (syntax, semantics, entities, etc.). |
+| **Representation** | Single focus point. | Multiple, diverse focus points. |
+| **Output** | A single attention vector. | A concatenated, high-dimensional vector. |
+| **Complexity** | Lower. | Higher, but fully parallelizable. |
+
+---
+
+## 5. The "Multi-Head" Icon
+In full Transformer diagrams, this complex set of operations is often simplified into a single block:
+* **Input:** $Q, K, V$ matrices.
+* **Output:** A rich, multi-faceted contextual representation.
+
+
+
+---
+
+# Summary: The Full Transformer Architecture
+
+The Transformer follows an **Encoder-Decoder** structure, but replaces recurrence with attention and positional encodings to allow for massive parallelization and better long-range dependency handling.
+
+---
+
+## 1. High-Level Architecture
+The Transformer is composed of two main sections: the **Encoder** (which processes the input sentence) and the **Decoder** (which generates the output translation).
+
+### The Encoder
+* **Input:** The source sentence (e.g., French) converted into embeddings.
+* **Structure:** A stack of $N$ identical blocks (usually $N=6$).
+* **Components:** Each block contains a **Multi-Head Attention** layer and a **Feed-Forward** neural network.
+* **Output:** A set of rich, contextualized vectors representing the input.
+
+### The Decoder
+* **Input:** The words generated so far in the target language (e.g., English).
+* **Structure:** A stack of $N$ identical blocks.
+* **Components:** 1. **Masked Multi-Head Attention:** Processes the output words generated so far.
+    2. **Encoder-Decoder Attention:** Uses the Decoder's query ($Q$) to pull information from the Encoder's keys ($K$) and values ($V$).
+    3. **Feed-Forward Network:** Final processing before predicting the next word.
+
+
+
+---
+
+## 2. Positional Encoding
+Because Transformers do not use RNNs, they have no inherent sense of word order. To fix this, we add **Positional Encodings** to the input embeddings.
+* **Method:** Uses a combination of **Sine** and **Cosine** functions of different frequencies.
+* **Result:** Every position in a sentence gets a unique signature vector that is added to the word embedding, allowing the model to know exactly where each word sits.
+
+
+
+---
+
+## 3. The "Bells and Whistles"
+To make the Transformer train faster and perform better, several specific techniques are used:
+
+* **Residual Connections (Add):** Like ResNets, these pass information (like positional data) directly around the attention layers to prevent vanishing gradients.
+* **Layer Normalization (Norm):** Similar to Batch Norm; it stabilizes the activations and speeds up training.
+* **Linear & Softmax:** The very last step of the decoder that turns the vectors into a probability distribution over the entire vocabulary to pick the next word.
+* **Masking:** During training, we "mask" (hide) future words so the model can't "cheat" by looking at the correct answer while trying to predict the next word.
+
+---
+
+## 4. Training vs. Inference (Prediction)
+| Phase | Process |
+| :--- | :--- |
+| **Inference** | Generates words one-by-one (Autoregressive). The output of step $t$ becomes the input for step $t+1$. |
+| **Training** | Uses **Masking** to process the entire correct translation at once. This makes training much faster than RNNs. |
+
+---
+
+## 5. Summary Table
+
+| Block | Key Inputs | Key Task |
+| :--- | :--- | :--- |
+| **Encoder** | Source Sentence | Understand the meaning and context of the input. |
+| **Decoder** | Target so far + Encoder Output | Map the input context to the target language. |
+| **Positional Encoding**| Sine/Cosine Waves | Give the model a sense of "Time" or "Order." |
+| **Multi-Head Attn** | $Q, K, V$ | Find relationships between words. |
+
+---
