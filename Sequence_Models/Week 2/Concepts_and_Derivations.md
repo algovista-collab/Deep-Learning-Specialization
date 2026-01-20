@@ -282,3 +282,60 @@ If you sample words strictly by their frequency in a text corpus, the training s
 | **CBOW (Continuous Bag of Words)** | Uses the surrounding context words to predict the "middle" word. |
 
 ---
+
+# 📉 Negative Sampling: Scaling Word2Vec
+
+While the original Skip-gram model is effective, the **Softmax** step is a massive computational bottleneck because it requires summing over the entire vocabulary for every training example. **Negative Sampling** solves this.
+
+---
+
+## 1. Redefining the Problem
+Instead of asking, *"What is the next word in the sequence?"* we ask a binary question: 
+> **"Is this pair of words (Context, Target) a 'positive' pair (found together) or a 'negative' pair (randomly associated)?"**
+
+### How to Generate the Dataset:
+1.  **Positive Example:** Pick a context word (e.g., "orange") and a target word within a window (e.g., "juice"). Label = **1**.
+2.  **Negative Examples:** Keep the same context word ("orange") and pick $k$ random words from the dictionary (e.g., "king", "book", "the"). Label = **0**.
+    * *Note:* Even if a random word (like "of") actually appears near "orange" in the text, we still label it **0** for this specific sampling step.
+
+
+
+---
+
+## 2. The Model Architecture
+We replace the giant Softmax with **$V$ binary logistic regression classifiers** (where $V$ is your vocabulary size).
+
+* **Model Formula:**
+    $$P(y=1 | c, t) = \sigma(\theta_t^T e_c)$$
+    * $\sigma$: Sigmoid function.
+    * $e_c$: Embedding vector for context word.
+    * $\theta_t$: Parameter vector for target word.
+
+### Why it's Faster:
+In the original model, you updated **10,000+** parameters every step. With Negative Sampling, for each positive example, you only update $k+1$ binary classifiers (the positive one plus $k$ negative ones).
+* For small datasets: $k = 5$ to $20$.
+* For large datasets: $k = 2$ to $5$.
+
+
+
+---
+
+## 3. Selecting Negative Examples
+How do we pick the $k$ random words? We shouldn't just pick them purely by frequency (too many "the's") or purely at random (not representative).
+
+The authors found a "middle ground" heuristic using the **3/4 power of word frequency**:
+$$P(w_i) = \frac{f(w_i)^{3/4}}{\sum_{j=1}^{V} f(w_j)^{3/4}}$$
+* **$f(w_i)$:** The observed frequency of the word.
+* **Result:** This increases the probability of sampling rare words and decreases the probability of sampling extremely common words compared to the raw distribution.
+
+---
+
+## 4. Summary Table
+
+| Feature | Standard Softmax | Negative Sampling |
+| :--- | :--- | :--- |
+| **Output Type** | Multi-class (1-of-V) | Binary (Is it a pair?) |
+| **Computation** | $O(V)$ — Expensive | $O(k)$ — Very Cheap |
+| **Efficiency** | Slow on large vocabularies | Highly scalable |
+
+---
