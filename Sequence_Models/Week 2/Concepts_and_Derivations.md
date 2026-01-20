@@ -1,4 +1,4 @@
-# 📘 Summary: Natural Language Processing & Word Embeddings
+# Natural Language Processing & Word Embeddings
 
 This lecture introduces the shift from traditional word representations to dense, featurized vectors, which has revolutionized the field of NLP.
 
