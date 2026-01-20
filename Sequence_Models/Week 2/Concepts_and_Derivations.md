@@ -339,3 +339,60 @@ $$P(w_i) = \frac{f(w_i)^{3/4}}{\sum_{j=1}^{V} f(w_j)^{3/4}}$$
 | **Efficiency** | Slow on large vocabularies | Highly scalable |
 
 ---
+
+# 🌐 The GloVe Algorithm (Global Vectors)
+
+The GloVe algorithm is based on the idea that the relationship between words can be captured by examining the **global co-occurrence counts** across the entire text corpus.
+
+---
+
+## 1. The Co-occurrence Matrix ($X$)
+GloVe starts by explicitly counting how often words appear near each other.
+* Let **$X_{ij}$** be the number of times word $i$ (target) appears in the context of word $j$ (context).
+* If we define "context" as any word within $\pm 10$ words, then $X_{ij} = X_{ji}$ (the relationship is symmetric).
+
+---
+
+## 2. The Optimization Objective
+The goal is to learn vectors $\theta_i$ and $e_j$ such that their dot product predicts the log of their co-occurrence frequency.
+
+**The Loss Function:**
+$$\text{Minimize} \sum_{i=1}^{V} \sum_{j=1}^{V} f(X_{ij}) (\theta_i^T e_j - \log X_{ij})^2$$
+
+* **$\theta_i^T e_j$**: The relationship between the two words.
+* **$\log X_{ij}$**: The ground truth (how often they actually appear together).
+* **$f(X_{ij})$**: A weighting function used to handle two issues:
+    1. It equals $0$ if $X_{ij}=0$ (to avoid $\log 0$).
+    2. It ensures "stop words" (the, a, is) don't dominate the learning, while still giving rare words (like "durian") enough weight to be meaningful.
+
+---
+
+## 3. Symmetry in GloVe
+Unlike Word2Vec where $\theta$ and $e$ play different roles (context vs. target), in GloVe, they are **mathematically symmetric**. 
+* Because they play the same role, the final embedding for a word $w$ is often calculated as the average:
+$$e_w^{(final)} = \frac{e_w + \theta_w}{2}$$
+
+---
+
+## 4. The "Interpretability" Problem
+While we often motivate embeddings using human concepts like **Gender**, **Age**, or **Royalty**, the actual dimensions learned by algorithms like GloVe are rarely that clean.
+
+
+
+* **Linear Transformations:** Because of the nature of linear algebra, the algorithm might learn a set of features that are "rotated" or "sheared" versions of human concepts. 
+* **Result:** Dimension 1 might be 30% Gender + 20% Royalty + 50% Age. You cannot simply look at one number in a 300D vector and know what it "means."
+* **The Good News:** Even if individual dimensions aren't interpretable to humans, the **parallelogram relationship** (analogies) still works perfectly for the computer.
+
+
+
+---
+
+## 5. Comparison: Word2Vec vs. GloVe
+
+| Feature | Word2Vec (Skip-gram) | GloVe |
+| :--- | :--- | :--- |
+| **Philosophy** | Local context prediction | Global co-occurrence counts |
+| **Mechanism** | Neural Network / Softmax | Matrix Factorization / Least Squares |
+| **Speed** | Fast for small windows | Efficient on large corpora counts |
+
+---
