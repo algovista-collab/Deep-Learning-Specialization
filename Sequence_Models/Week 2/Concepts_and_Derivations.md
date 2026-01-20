@@ -396,3 +396,54 @@ While we often motivate embeddings using human concepts like **Gender**, **Age**
 | **Speed** | Fast for small windows | Efficient on large corpora counts |
 
 ---
+
+# ⚖️ Debiasing Word Embeddings
+
+Machine learning models are only as good as the data they are trained on. Because word embeddings are learned from text written by humans (the internet, books, etc.), they can inherit and even amplify societal biases regarding gender, race, and age.
+
+---
+
+## 1. The Problem: Learned Bias
+Researchers discovered that word embeddings can pick up harmful analogies from the training corpus.
+* **Positive Analogy:** *Man is to Computer Programmer as Woman is to Homemaker.*
+* **Negative Analogy:** *Father is to Doctor as Mother is to Nurse.*
+
+These biases aren't just conceptual; they affect real-world applications like resume screening or automated loan approvals.
+
+---
+
+## 2. The Bolukbasi et al. Debiasing Process
+To fix this, we follow a three-step mathematical process to "neutralize" the embeddings.
+
+### Step 1: Identify the Bias Direction
+First, we find the specific axis in the 300D space that represents the bias (e.g., Gender).
+* We subtract vector pairs: $e_{man} - e_{woman}$, $e_{male} - e_{female}$, etc.
+* We average these differences to find the **Bias Direction** and its **Orthogonal (Non-Bias) Direction**.
+
+### Step 2: Neutralize
+For words that are not inherently gendered (like "Doctor," "Programmer," or "Poet"), we project them onto the orthogonal axis to remove the bias component.
+* This ensures that the mathematical distance from "Doctor" to "Man" is exactly the same as the distance from "Doctor" to "Woman."
+
+### Step 3: Equalize
+For words that *do* have a biological gender (like "Grandmother" and "Grandfather"), we ensure they are equidistant from the neutral words. 
+* If "Babysitter" has been neutralized, we want both "Grandmother" and "Grandfather" to be at the exact same distance from "Babysitter" so that the model doesn't favor one over the other.
+
+---
+
+## 3. Summary of Steps
+
+| Step | Action | Goal |
+| :--- | :--- | :--- |
+| **Identify** | Average the difference of gendered pairs. | Define the "Bias Axis." |
+| **Neutralize** | Project non-gendered words to the zero-bias axis. | Remove bias from jobs/traits. |
+| **Equalize** | Move gendered pairs to be equidistant from neutral words. | Ensure symmetric relationships. |
+
+---
+
+## 4. Why This Matters
+If you don't debias your embeddings:
+1. **Search results** might be biased (e.g., searching "brilliant physicist" only shows male results).
+2. **Hiring tools** might automatically penalize resumes that contain words associated with a specific gender or ethnicity.
+3. **Language models** (like ChatGPT) might generate stereotypical or offensive content.
+
+---
