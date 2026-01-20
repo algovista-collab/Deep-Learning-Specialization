@@ -476,3 +476,108 @@ A common variation where the gate layers ($\Gamma_u, \Gamma_f, \Gamma_o$) don't 
 The "conveyor belt" of the cell state $c$ allows information to flow through the top of the unit with only minor linear interactions. This prevents the gradients from vanishing exponentially, allowing a subject at time $t=1$ to strongly influence a verb at time $t=100$.
 
 ---
+
+# Bidirectional RNN (BRNN)
+
+In standard RNNs (including GRUs and LSTMs), the prediction $\hat{y}^{<t>}$ only depends on the current input $x^{<t>}$ and information from the **past** ($x^{<1>}, \dots, x^{<t-1>}$). This is a problem when the "future" context is needed to understand the present.
+
+---
+
+## 🧐 Motivation: The "Teddy" Problem
+Consider these two sentences:
+1. "He said **Teddy** Roosevelt was a great president."
+2. "He said **Teddy** bears are on sale."
+
+If you only look at the first three words ("He said Teddy"), it is impossible to know if "Teddy" is a person's name ($y=1$) or a toy ($y=0$). You need the words "Roosevelt" or "bears" (the future) to decide.
+
+---
+
+## 🏗️ How it Works
+A Bidirectional RNN consists of two independent hidden layers that process the sequence in opposite directions:
+1. **Forward Pass ($\vec{a}$):** Processes the sequence from $t=1$ to $t=T_x$.
+2. **Backward Pass ($\overleftarrow{a}$):** Processes the sequence from $t=T_x$ down to $t=1$.
+
+
+
+### The Prediction Equation
+At any time step $t$, the output $\hat{y}^{<t>}$ is calculated by combining the information from both directions:
+$$\hat{y}^{<t>} = g(W_y [\vec{a}^{<t>}, \overleftarrow{a}^{<t>}] + b_y)$$
+
+This ensures that the model has access to the **entire sequence** when making a prediction for any specific word.
+
+---
+
+## ⚙️ Key Features and blocks
+* **Universal Compatibility:** The "cells" used in a BRNN can be standard RNN units, GRUs, or LSTMs.
+* **The "Gold Standard":** For most complex NLP tasks, a **Bidirectional LSTM (Bi-LSTM)** is the most common and effective starting point.
+
+---
+
+## ⚖️ Pros and Cons
+
+| Advantages | Disadvantages |
+| :--- | :--- |
+| Can capture context from both the past and the future. | **Latency:** You must wait for the *entire* sequence to finish before making the first prediction. |
+| Significantly improves accuracy in tasks like Named Entity Recognition (NER). | **Not for real-time:** Harder to use in live speech recognition where you need immediate output as someone talks. |
+
+---
+
+## 🗝️ Summary
+While a standard RNN/GRU/LSTM is a **unidirectional** "forward-only" model, the Bidirectional RNN adds a second "backward" layer. This provides the network with a complete "global" view of the sequence before it labels any individual part.
+
+---
+
+<img width="1053" height="590" alt="Screenshot 2026-01-20 085052" src="https://github.com/user-attachments/assets/22f21a98-d744-4aec-a70f-c57c8cba578e" />
+
+# Deep RNNs
+
+While a standard RNN is "deep" in the temporal dimension (across time steps), we can also make them "deep" in the vertical dimension by stacking multiple layers of recurrent units on top of one another.
+
+---
+
+## 🏗️ Architecture and Notation
+
+In a Deep RNN, the activation of a hidden layer at a specific time step serves as the input for the layer directly above it.
+
+* **Notation:** $a^{[l]<t>}$
+    * $[l]$ denotes the **layer number**.
+    * $<t>$ denotes the **time step**.
+
+
+
+### The Calculation
+For example, to compute the activation for the 2nd layer at the 3rd time step ($a^{[2]<3>}$), the model looks at two inputs:
+1. The activation from the same layer at the previous time step ($a^{[2]<2>}$).
+2. The activation from the layer below at the current time step ($a^{[1]<3>}$).
+
+**Formula:**
+$$a^{[l]<t>} = g(W_a^{[l]} [a^{[l]<t-1>}, a^{[l-1]<t>}] + b_a^{[l]})$$
+
+---
+
+## 📏 Depth in RNNs vs. CNNs
+
+Unlike Convolutional Neural Networks (CNNs), which might have 100+ layers, Deep RNNs typically only have a few layers (e.g., **3 layers**).
+
+* **Temporal Complexity:** Because an RNN is already unrolled across hundreds or thousands of time steps, it is computationally expensive. Stacking too many layers vertically makes the model extremely difficult to train.
+* **Hybrid Approaches:** Often, researchers use a small number of recurrent layers (with horizontal connections) and then stack "standard" dense deep layers (without horizontal connections) on top of the final recurrent layer to make the prediction $\hat{y}$.
+
+---
+
+## 🛠️ Key Variations
+* **Unit Types:** The blocks in a Deep RNN can be basic RNN units, **GRUs**, or **LSTMs**.
+* **Bidirectional:** You can also create **Deep Bidirectional RNNs**, where each vertical layer contains both a forward and a backward pass.
+
+---
+
+## 🗝️ Summary of the RNN Toolbox
+With the conclusion of these topics, you now have the complete set of tools for sequence modeling:
+1. **Basic RNN:** For simple sequences.
+2. **GRU/LSTM:** To solve the vanishing gradient problem and handle long-term dependencies.
+3. **Bidirectional RNN:** To incorporate both past and future context.
+4. **Deep RNN:** To learn complex, high-level features of a sequence.
+
+---
+
+<img width="1032" height="582" alt="Screenshot 2026-01-20 090528" src="https://github.com/user-attachments/assets/2747d0d7-92c5-491e-a9b4-50a7d1de5600" />
+
