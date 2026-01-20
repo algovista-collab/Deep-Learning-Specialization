@@ -228,3 +228,57 @@ Researchers discovered that if the primary goal is to learn the matrix $E$ (and 
 While complex models (using large windows and hidden layers) are great for language modeling, **simpler models** using a single nearby word as context (like the **Skip-gram** model) are remarkably effective at learning high-quality word embeddings while being much faster to train.
 
 ---
+
+# ⚡ The Word2Vec Skip-gram Model
+
+The Skip-gram model simplifies the task of learning word embeddings by predicting a **Target ($t$)** word from a single **Context ($c$)** word.
+
+---
+
+## 1. Defining the Supervised Learning Problem
+Instead of using a sequence of preceding words, Skip-gram randomly selects a "Context" word and then picks a "Target" word within a fixed window (e.g., $\pm 5$ or $\pm 10$ words).
+
+**Example sentence:** *"I want a glass of orange juice to go..."*
+If the Context word is **"orange"**, the training pairs might be:
+* `(orange, juice)`
+* `(orange, glass)`
+* `(orange, my)`
+
+
+
+---
+
+## 2. Model Architecture
+The model is essentially a shallow neural network consisting of an embedding lookup followed by a Softmax layer.
+
+1.  **Input:** One-hot vector $O_c$ for the context word.
+2.  **Embedding Lookup:** $e_c = E \cdot O_c$ (extracting the 300D vector).
+3.  **Output (Softmax):** Calculates the probability of word $t$ given context $c$:
+    $$P(t|c) = \frac{e^{\theta_t^T e_c}}{\sum_{j=1}^{10,000} e^{\theta_j^T e_c}}$$
+    * $\theta_t$ is the parameter vector associated with the output word $t$.
+
+---
+
+## 3. The Computation Bottleneck
+The primary weakness of the Skip-gram model is the **Softmax denominator**. 
+
+* **The Problem:** Summing over the entire vocabulary (10k, 100k, or 1M words) for every single training step is computationally expensive and slow.
+* **The Solution (Hierarchical Softmax):** Instead of a flat search, a tree-based classifier reduces the complexity from $O(V)$ to $O(\log V)$.
+    * Common words like "the" or "of" are placed at the top of the tree for faster access.
+    * Rare words like "durian" are placed deeper in the tree.
+
+---
+
+## 4. Word Sampling Heuristics
+If you sample words strictly by their frequency in a text corpus, the training set will be dominated by "stop words" (e.g., *the, of, a, and*). 
+* **Balancing:** Heuristics are used to down-sample frequent words and up-sample less common words. This ensures the model spends enough time learning meaningful embeddings for words like "apple" or "durian" rather than just "the."
+
+---
+
+## 5. Summary of Word2Vec Variants
+| Model | Mechanism |
+| :--- | :--- |
+| **Skip-gram** | Uses one word to predict the surrounding "context" words. |
+| **CBOW (Continuous Bag of Words)** | Uses the surrounding context words to predict the "middle" word. |
+
+---
