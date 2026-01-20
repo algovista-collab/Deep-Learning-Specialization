@@ -215,3 +215,56 @@ Since a French sentence and its English translation may have different word coun
 * **Flexibility:** By choosing where to place the output $\hat{y}$, you can adapt the RNN to almost any sequential data problem.
 
 ---
+
+# RNN Language Modeling
+
+A language model is a system that estimates the probability of a sentence or a sequence of words. This is a foundational task for Speech Recognition, Machine Translation, and Content Generation.
+
+---
+
+## 🧐 What does a Language Model do?
+A language model calculates the probability of a specific sequence of words $P(y^{<1>}, y^{<2>}, \dots, y^{<T_y>})$.
+
+* **Example (Speech Recognition):**
+    * *Sentence A:* "The apple and **pair** salad was delicious."
+    * *Sentence B:* "The apple and **pear** salad was delicious."
+* Even if they sound identical, the model assigns a much higher probability to **Sentence B**, allowing the system to output the correct text.
+
+---
+
+## 🛠️ Building a Language Model with RNNs
+
+### 1. Preprocessing (Tokenization)
+Before training, you must process a large body of text (**corpus**):
+* **Vocabulary:** Create a list of all words (e.g., 10,000 words).
+* **`<EOS>` (End of Sentence):** An optional token added to the end of sentences so the model learns when to stop.
+* **`<UNK>` (Unknown):** A token used to replace words not found in your vocabulary.
+
+### 2. RNN Architecture for Language Modeling
+In a language model, the input at time $t$ ($x^{<t>}$) is actually the **actual word** from the previous time step ($y^{<t-1>}$).
+
+
+
+**The Training Flow:**
+1. **Time Step 1:** Input $x^{<1>} = \vec{0}$ (and $a^{<0>} = \vec{0}$). The model predicts $\hat{y}^{<1>}$ via a **Softmax** over the entire vocabulary (what is the first word?).
+2. **Time Step 2:** Input $x^{<2>} = y^{<1>}$ (the *actual* first word from the training data). The model predicts the probability of the second word given the first.
+3. **Time Step $t$:** Input $x^{<t>} = y^{<t-1>}$. The model predicts $\hat{y}^{<t>}$: the probability of the current word given all preceding words.
+
+---
+
+## 🧪 Loss Function
+
+The model uses a **Softmax loss** at each time step $t$:
+$$\mathcal{L}(\hat{y}^{<t>}, y^{<t>}) = -\sum_{i} y_i^{<t>} \log \hat{y}_i^{<t>}$$
+
+The **Total Loss** for the sequence is the sum of losses at every time step:
+$$\mathcal{L} = \sum_{t} \mathcal{L}^{<t>}(\hat{y}^{<t>}, y^{<t>})$$
+
+---
+
+## 🔮 How it Predicts a Sentence Probability
+For a sentence like "Cats average sleep," the model calculates:
+$$P(\text{cats, average, sleep}) = P(\text{cats}) \times P(\text{average} \mid \text{cats}) \times P(\text{sleep} \mid \text{cats, average})$$
+Each of these conditional probabilities is provided by one of the RNN's Softmax outputs.
+
+---
