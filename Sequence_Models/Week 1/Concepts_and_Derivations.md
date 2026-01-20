@@ -317,3 +317,49 @@ When you sample from a trained model, the output reflects the style of the train
 
 ## ⚠️ Challenges in RNNs
 Standard RNNs suffer from **Vanishing Gradients**, making it hard for them to remember information from the beginning of a long sentence by the time they reach the end.
+
+---
+
+# The Vanishing Gradient Problem in RNNs
+
+While RNNs are theoretically capable of handling long sequences, they often struggle with **long-term dependencies** in practice due to vanishing gradients.
+
+---
+
+## 🧠 The Problem: Long-Term Dependencies
+
+In languages like English, a word appearing very early in a sentence can dictate a word much later.
+
+* **Example:** * "The **cat**, which ate... [many words] ... **was** full." (Singular)
+    * "The **cats**, which ate... [many words] ... **were** full." (Plural)
+
+A standard RNN often forgets whether the subject was singular or plural by the time it reaches the verb because the "signal" from the beginning of the sentence washes out.
+
+---
+
+## 📉 Vanishing vs. Exploding Gradients
+
+An RNN processing a sequence of 1,000 steps is essentially a **1,000-layer deep neural network**. This leads to two major issues during backpropagation:
+
+
+
+### 1. Vanishing Gradients (The Hard Problem)
+* **What happens:** As the gradient is multiplied by weight matrices repeatedly through many time steps, it can decrease exponentially.
+* **The Result:** The model’s weights are not updated effectively to account for information from the distant past. It becomes "biased" toward local influences (nearby words).
+* **Difficulty:** This is hard to solve and requires architectural changes like GRUs or LSTMs.
+
+### 2. Exploding Gradients (The Catastrophic Problem)
+* **What happens:** Gradients increase exponentially, leading to extremely large weight updates.
+* **The Result:** Parameters "blow up," often resulting in `NaN` (Not a Number) errors in your code.
+* **The Fix: Gradient Clipping.** If the gradient vector exceeds a certain threshold, you rescale it (clip it) to a maximum value to keep the training stable.
+
+---
+
+## 🛠️ Comparison Summary
+
+| Issue | Detection | Common Solution |
+| :--- | :--- | :--- |
+| **Exploding Gradients** | `NaN` values, sudden spikes in loss. | **Gradient Clipping** (simple & effective). |
+| **Vanishing Gradients** | Model fails to learn long-range patterns. | **Gated Units (GRU/LSTM)** (requires new architecture). |
+
+---
