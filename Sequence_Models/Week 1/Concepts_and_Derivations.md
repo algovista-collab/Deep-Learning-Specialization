@@ -279,7 +279,7 @@ After training a language model, you can "sample" from it to generate new sequen
 
 To generate a sequence, the model predicts one step at a time, but instead of using a fixed target, it uses its own previous predictions as inputs for the next step.
 
-
+<img width="1042" height="573" alt="Screenshot 2026-01-20 082453" src="https://github.com/user-attachments/assets/9c335c2f-745c-41f3-84e2-1ae8dbe4a0a1" />
 
 ### Step-by-Step Procedure:
 1. **Initial Step:** Input $x^{<1>} = \vec{0}$ and $a^{<0>} = \vec{0}$.
