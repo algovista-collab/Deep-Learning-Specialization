@@ -171,5 +171,47 @@ It is called "Through Time" because you are scanning from the end of the sequenc
 
 ---
 
-## 💡 Key Takeaway
-While modern frameworks (like TensorFlow or PyTorch) handle these derivative calculations automatically, understanding BPTT is crucial for identifying issues like **Vanishing Gradients**, which can happen when sequences are very long.
+# RNN Architecture Variations
+
+Recurrent Neural Networks are highly flexible. Depending on the application, the length of the input sequence ($T_x$) does not have to match the length of the output sequence ($T_y$).
+
+---
+
+## 📊 Summary of RNN Types
+
+| Type | Input ($T_x$) | Output ($T_y$) | Example Application |
+| :--- | :--- | :--- | :--- |
+| **One-to-One** | 1 | 1 | Standard Neural Network (not typically an RNN) |
+| **One-to-Many** | 1 | >1 | Music Generation, Image Captioning |
+| **Many-to-One** | >1 | 1 | Sentiment Classification (Rating a movie review) |
+| **Many-to-Many ($T_x = T_y$)** | >1 | >1 | Named Entity Recognition (NER) |
+| **Many-to-Many ($T_x \neq T_y$)** | >1 | >1 | Machine Translation (Encoder-Decoder) |
+
+---
+
+## 🛠️ Architecture Deep Dive
+
+
+
+### 1. Many-to-One (Sentiment Classification)
+The model processes every word in a sentence sequentially, but only produces a prediction after the final word has been "read."
+* **Flow:** $x^{<1>}, x^{<2>}, \dots, x^{<T_x>} \to \text{Hidden States} \to \hat{y}$
+
+### 2. One-to-Many (Music Generation)
+The model takes a single input (like a genre ID or a starting note) and generates a sequence of outputs.
+* **Flow:** $x \to \text{RNN Cell} \to \hat{y}^{<1>}, \hat{y}^{<2>}, \dots$
+* **Note:** Often, the output $\hat{y}^{<t>}$ is fed back into the next time step as the input.
+
+### 3. Many-to-Many (Variable Length / Machine Translation)
+Since a French sentence and its English translation may have different word counts, a "Syncronous" RNN won't work. Instead, we use an **Encoder-Decoder** architecture:
+* **Encoder:** Reads the entire input sequence and compresses it into a vector.
+* **Decoder:** Takes that vector and generates the output sequence in the target language.
+
+---
+
+## 🗝️ Core Concepts
+* **Andrej Karpathy's Influence:** This classification is popularized by the blog post *"The Unreasonable Effectiveness of Recurrent Neural Networks."*
+* **Parameter Sharing:** In all these variations, the internal weights ($W_{aa}$, $W_{ax}$, etc.) remain shared across all time steps.
+* **Flexibility:** By choosing where to place the output $\hat{y}$, you can adapt the RNN to almost any sequential data problem.
+
+---
