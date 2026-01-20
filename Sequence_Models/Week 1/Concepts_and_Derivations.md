@@ -91,7 +91,7 @@ Standard neural networks (Vanilla NNs) are poorly suited for sequence tasks like
 ## 🏗️ RNN Architecture
 An RNN processes a sequence one step at a time, maintaining a "hidden state" (activation) that carries information from previous time steps to the current one.
 
-
+<img width="1025" height="553" alt="image" src="https://github.com/user-attachments/assets/9b319c06-5aed-4627-af27-d14d1c019049" />
 
 ### Key Components
 * **$x^{<t>}$**: Input at time step $t$.
