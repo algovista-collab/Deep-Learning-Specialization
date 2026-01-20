@@ -191,7 +191,7 @@ Recurrent Neural Networks are highly flexible. Depending on the application, the
 
 ## 🛠️ Architecture Deep Dive
 
-
+<img width="1840" height="1001" alt="Screenshot 2026-01-20 080231" src="https://github.com/user-attachments/assets/14e3303c-e21e-486b-94a0-188d3bc7aae9" />
 
 ### 1. Many-to-One (Sentiment Classification)
 The model processes every word in a sentence sequentially, but only produces a prediction after the final word has been "read."
