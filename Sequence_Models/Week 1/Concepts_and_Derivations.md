@@ -409,3 +409,70 @@ The full version of the GRU includes an additional gate called the **Relevance G
 Because the update gate $\Gamma_u$ can be **very close to 0**, the network can choose to skip the update entirely ($c^{<t>} \approx c^{<t-1>}$). This creates a "shortcut" for the gradient to flow backwards through time without being multiplied by small numbers, effectively preserving the signal across hundreds of steps.
 
 ---
+
+# Long Short-Term Memory (LSTM)
+
+The LSTM is a more powerful and flexible evolution of the RNN, predating the GRU. It is specifically designed to solve the vanishing gradient problem by allowing the network to maintain a "cell state" that can carry information unchanged across many time steps.
+
+---
+
+## 🧠 Key Differences from GRU
+Unlike the GRU, where the activation $a^{<t>}$ is the same as the cell state $c^{<t>}$, the LSTM treats them as two separate quantities. It also uses **three gates** instead of two, providing finer control over the memory.
+
+<img width="864" height="482" alt="Screenshot 2026-01-20 082816" src="https://github.com/user-attachments/assets/57f6d121-fa49-40ea-ac1f-629879c561e0" />
+
+---
+
+## 🧪 The LSTM Equations
+
+The behavior of an LSTM at time $t$ is governed by these six equations:
+
+### 1. The Candidate Value
+Computes a potential new value to be added to the cell state.
+$$\tilde{c}^{<t>} = \tanh(W_c [a^{<t-1>}, x^{<t>}] + b_c)$$
+
+### 2. The Three Gates
+All gates use a **sigmoid** ($\sigma$) function, resulting in values between 0 and 1.
+* **Update Gate ($\Gamma_u$):** Decides what new information to store.
+* **Forget Gate ($\Gamma_f$):** Decides what old information to discard.
+* **Output Gate ($\Gamma_o$):** Decides what part of the cell state to output as the activation.
+
+$$\Gamma_u = \sigma(W_u [a^{<t-1>}, x^{<t>}] + b_u)$$
+$$\Gamma_f = \sigma(W_f [a^{<t-1>}, x^{<t>}] + b_f)$$
+$$\Gamma_o = \sigma(W_o [a^{<t-1>}, x^{<t>}] + b_o)$$
+
+### 3. The State Updates
+* **Cell State ($c^{<t>}$):** Combines the old memory (multiplied by the forget gate) and the new candidate (multiplied by the update gate).
+  $$c^{<t>} = \Gamma_u * \tilde{c}^{<t>} + \Gamma_f * c^{<t-1>}$$
+* **Activation ($a^{<t>}$):** The final output of the unit.
+  $$a^{<t>} = \Gamma_o * \tanh(c^{<t>})$$
+
+---
+
+## 🛠️ Important Variations
+
+### Peephole Connections
+A common variation where the gate layers ($\Gamma_u, \Gamma_f, \Gamma_o$) don't just look at $a^{<t-1>}$ and $x^{<t>}$, but also "peek" at the previous cell state $c^{<t-1>}$.
+* Usually, this is an **element-wise** relationship (the $i$-th component of the cell state affects only the $i$-th component of the gates).
+
+---
+
+## 📊 GRU vs. LSTM: Which one to use?
+
+| Feature | GRU (Gated Recurrent Unit) | LSTM (Long Short-Term Memory) |
+| :--- | :--- | :--- |
+| **Complexity** | Simpler (2 gates) | More complex (3 gates) |
+| **Speed** | Faster to compute | Slower due to more parameters |
+| **Scaling** | Easier to build very large networks | Historically more robust |
+| **Performance** | Often matches LSTM performance | More flexible; the "proven" default |
+
+### Summary Advice:
+* **LSTM** is the historically proven "gold standard." Use it as your default first choice.
+* **GRU** is gaining momentum because it is computationally cheaper and can often scale better to massive models while performing just as well.
+
+---
+
+## 🗝️ Why it Works
+The "conveyor belt" of the cell state $c$ allows information to flow through the top of the unit with only minor linear interactions. This prevents the gradients from vanishing exponentially, allowing a subject at time $t=1$ to strongly influence a verb at time $t=100$.
+
+---
