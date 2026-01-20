@@ -118,3 +118,157 @@ Using the example: *"Jane visite l'Afrique en Septembre"* $\rightarrow$ *"Jane v
 > **Crucial Difference:** You don't want a random translation; you want the *optimal* translation. This requires algorithms like **Beam Search** rather than simple random sampling.
 
 ---
+
+# Summary: Beam Search Refinements & Length Normalization
+
+This lesson covers critical adjustments to the basic Beam Search algorithm to handle numerical stability, sentence length bias, and performance trade-offs.
+
+---
+
+## 1. Numerical Stability: Using Log-Probabilities
+In practice, multiplying many probabilities (all $< 1$) leads to **numerical underflow**, where the resulting number becomes too small for a computer to store accurately.
+
+* **The Solution:** Instead of maximizing the product of probabilities, we maximize the **sum of their logs**:
+    $$\arg \max \sum_{t=1}^{T_y} \log P(y^{\langle t \rangle} \mid x, y^{\langle 1 \rangle}, \dots, y^{\langle t-1 \rangle})$$
+* Because the $log$ function is strictly increasing, maximizing the sum of logs is mathematically equivalent to maximizing the original product.
+
+---
+
+## 2. Length Normalization
+Standard Seq2Seq models have a **bias toward short sentences**. This is because every additional word added to a sequence involves multiplying by another probability $< 1$ (or adding a negative log-probability), which naturally decreases the total score.
+
+### The Normalization Formula
+To penalize longer sentences less severely, we divide the score by the number of words $T_y$, often raised to a hyperparameter $\alpha$:
+
+$$\text{Score} = \frac{1}{T_y^\alpha} \sum_{t=1}^{T_y} \log P(y^{\langle t \rangle} \mid x, \dots)$$
+
+* **$\alpha = 0$:** No normalization (original biased version).
+* **$\alpha = 1$:** Full normalization (averaging the log-probability).
+* **$\alpha \approx 0.7$:** A common heuristic "sweet spot" used in many production systems.
+
+
+
+---
+
+## 3. Implementation Details
+
+### How to Pick the Best Sentence
+1.  Run Beam Search for a fixed number of steps (e.g., 30).
+2.  Keep track of all candidate sentences that reached an **<EOS>** token during the process.
+3.  Calculate the **normalized log-likelihood objective** for each.
+4.  Pick the single sentence with the highest normalized score.
+
+---
+
+## 4. Choosing Beam Width ($B$)
+The choice of $B$ is a trade-off between computational cost and accuracy:
+
+| Beam Width ($B$) | Pros | Cons | Usage |
+| :--- | :--- | :--- | :--- |
+| **Small** (e.g., 1–3) | Very fast, low memory. | Often misses the optimal translation. | Mobile/Real-time apps. |
+| **Medium** (e.g., 10–100) | Great balance of speed/quality. | Higher computational cost. | Standard production systems. |
+| **Large** (e.g., 1000+) | Highest possible accuracy. | Very slow, high memory. | Research / "Squeezing" performance. |
+
+### Key Insight
+The gain from increasing $B$ usually shows **diminishing returns**. Moving from $B=1$ to $B=10$ often gives a huge boost, while moving from $B=1000$ to $B=3000$ may result in only a marginal improvement.
+
+---
+
+## 5. Beam Search vs. Exact Search
+* **Exact Search (BFS/DFS):** Guaranteed to find the absolute maximum probability but is computationally impossible due to the exponential search space.
+* **Beam Search:** An **approximate search algorithm**. It runs much faster but is not guaranteed to find the absolute maximum.
+
+# Summary: Error Analysis in Beam Search
+
+Beam Search is an approximate (heuristic) search algorithm. When it produces a poor result, it is crucial to determine if the failure lies in the **Search Algorithm** or the **RNN Model**.
+
+---
+
+## 1. The Diagnostic Test
+To perform error analysis, take a human-provided "gold" translation ($y^*$) and the machine-generated translation ($\hat{y}$). Compute the probability of both according to your RNN:
+
+1.  **Calculate** $P(y^* \mid x)$
+2.  **Calculate** $P(\hat{y} \mid x)$
+
+> **Note:** If you are using length normalization, compare the **normalized log-likelihood scores** instead of raw probabilities.
+
+---
+
+## 2. Attributing the Error
+
+### Case 1: $P(y^* \mid x) > P(\hat{y} \mid x)$
+* **Meaning:** The RNN actually preferred the correct human translation, but Beam Search failed to find it.
+* **Culprit:** **Beam Search.** * **Solution:** Increasing the beam width ($B$) is likely to help.
+
+### Case 2: $P(y^* \mid x) \leq P(\hat{y} \mid x)$
+* **Meaning:** The RNN mistakenly assigned a higher probability to a bad translation. Beam Search did its job correctly by finding the most "likely" (per the model) result.
+* **Culprit:** **RNN Model.** * **Solution:** Spend time on model architecture, training data, or regularization.
+
+---
+
+## 3. Systematic Error Analysis
+Go through your development set and create a table to track the source of errors.
+
+| Example | $P(y^* \mid x)$ | $P(\hat{y} \mid x)$ | At Fault |
+| :--- | :--- | :--- | :--- |
+| 1 | $2 \times 10^{-10}$ | $1 \times 10^{-10}$ | **Beam Search** |
+| 2 | $1 \times 10^{-10}$ | $5 \times 10^{-10}$ | **RNN** |
+| 3 | $0.5 \times 10^{-10}$ | $2 \times 10^{-10}$ | **RNN** |
+
+
+
+## 4. Conclusion
+* If **Beam Search** is responsible for a large fraction of errors, focus on the search algorithm (increase $B$).
+* If the **RNN** is responsible for most errors, focus on the neural network (data, architecture, or hyperparameter tuning).
+
+---
+
+# Summary: The BLEU Score (Bilingual Evaluation Understudy)
+
+In tasks like Machine Translation or Image Captioning, multiple different outputs can be considered "correct." The BLEU score provides a way to evaluate these outputs automatically.
+
+---
+
+## 1. The Core Concept
+The **BLEU (Bilingual Evaluation Understudy)** score measures how close a machine-generated translation is to human-provided references.
+* It serves as a substitute for human evaluators.
+* It produces a single real-number metric (0 to 1) to compare model performance.
+
+---
+
+## 2. Modified N-Gram Precision ($P_n$)
+To prevent a model from "cheating" (e.g., outputting "the the the the"), BLEU uses **Clipped Precision**.
+
+### The Logic:
+1.  **Count:** Count the number of times an n-gram (word or sequence of words) appears in the machine output.
+2.  **Clip:** Cap that count at the maximum number of times that n-gram appears in any **single** reference sentence.
+3.  **Calculate:** Divide the sum of clipped counts by the total number of n-grams in the machine output.
+
+
+
+---
+
+## 3. Calculating the Final Score
+The final BLEU score combines precisions for different n-gram lengths (typically $n=1$ to $4$) and adds a penalty for length.
+
+### The Combined Formula:
+$$\text{BLEU} = \text{BP} \times \exp\left(\frac{1}{N} \sum_{n=1}^{N} \log p_n\right)$$
+
+### The Brevity Penalty (BP)
+Machine models can get high precision scores by outputting very short, safe sentences. The **Brevity Penalty** reduces the score of translations that are shorter than the human references.
+* **$BP = 1$**: If machine output length $>$ human reference length.
+* **$BP < 1$**: If machine output length $\leq$ human reference length.
+
+---
+
+## 4. Summary Table
+
+| Feature | Details |
+| :--- | :--- |
+| **Use Cases** | Machine Translation, Image Captioning. |
+| **Avoided In** | Speech Recognition (where there is usually only one "correct" transcript). |
+| **Unigrams ($P_1$)** | Measures "coverage" (is the vocabulary correct?). |
+| **Bigrams/Trigrams** | Measures "fluency" (do the words flow together correctly?). |
+| **Primary Benefit** | Allows for rapid, automated testing of model improvements. |
+
+---
