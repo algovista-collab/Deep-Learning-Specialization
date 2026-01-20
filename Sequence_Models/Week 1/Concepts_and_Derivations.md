@@ -304,6 +304,8 @@ While we have focused on word-level models, you can also train an RNN at the cha
 | **Complexity** | Efficient and easy to train | Computationally expensive |
 | **Dependency** | Captures long-range context better | Struggles with long-range context |
 
+<img width="961" height="548" alt="Screenshot 2026-01-20 082640" src="https://github.com/user-attachments/assets/db2ccce6-7f21-497a-9380-25746080dc44" />
+
 ---
 
 ## 🎭 Examples of Generated Text
