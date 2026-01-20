@@ -131,3 +131,45 @@ The standard RNN described here is **unidirectional**.
 * **The Fix:** This is addressed later using **Bidirectional RNNs (BRNNs)**.
 
 ---
+
+# Backpropagation Through Time (BPTT)
+
+In Recurrent Neural Networks, backpropagation is referred to as **Backpropagation Through Time** because the gradient calculations move backward from the final time step to the beginning of the sequence.
+
+---
+
+## 🔁 The Computation Graph
+
+To understand backprop, we first look at the flow of the forward pass and the resulting loss calculation:
+
+1. **Forward Pass:** Information flows from left to right ($x^{<1>} \to a^{<1>} \to a^{<2>} \dots$).
+2. **Parameters:** The same parameters ($W_a, b_a, W_y, b_y$) are reused at every time step.
+3. **Loss Calculation:** A loss is calculated at every time step $t$.
+
+
+
+### 1. Element-wise Loss
+For a single time step $t$, we use the **Cross-Entropy Loss** (standard for binary classification/NER):
+$$\mathcal{L}^{<t>}(\hat{y}^{<t>}, y^{<t>}) = -y^{<t>} \log \hat{y}^{<t>} - (1 - y^{<t>}) \log (1 - \hat{y}^{<t>})$$
+
+### 2. Global Loss
+The overall loss for the entire sequence is the sum of the losses at each time step:
+$$\mathcal{L} = \sum_{t=1}^{T_y} \mathcal{L}^{<t>}(\hat{y}^{<t>}, y^{<t>})$$
+
+---
+
+## ⬅️ The Backward Pass (BPTT)
+
+The "Backpropagation Through Time" process involves following the computation graph in the opposite direction of the arrows:
+
+* **Step 1:** Calculate the derivative of the global loss $\mathcal{L}$ with respect to the outputs $\hat{y}^{<t>}$.
+* **Step 2:** Flow the gradients backward through the network to compute derivatives for the hidden states $a^{<t>}$.
+* **Step 3:** Because parameters $W$ and $b$ are shared across all time steps, their total gradient is the sum of the gradients calculated at each individual time step.
+
+### Why the name?
+It is called "Through Time" because you are scanning from the end of the sequence ($T_x$) back to the beginning ($t=1$), effectively reversing the temporal flow of the forward pass.
+
+---
+
+## 💡 Key Takeaway
+While modern frameworks (like TensorFlow or PyTorch) handle these derivative calculations automatically, understanding BPTT is crucial for identifying issues like **Vanishing Gradients**, which can happen when sequences are very long.
