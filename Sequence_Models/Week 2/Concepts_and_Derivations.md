@@ -447,3 +447,55 @@ If you don't debias your embeddings:
 3. **Language models** (like ChatGPT) might generate stereotypical or offensive content.
 
 ---
+
+# ⚖️ Debiasing Word Embeddings
+
+Word embeddings often inherit human biases present in the training text (e.g., "Man is to Computer Programmer as Woman is to Homemaker"). To prevent AI from making biased decisions in hiring, loans, or criminal justice, we use a formal debiasing process.
+
+---
+
+## 1. The Three-Step Debiasing Algorithm
+Based on the work of **Bolukbasi et al.**, we can adjust the vector space to eliminate undesirable correlations while preserving legitimate semantic meanings.
+
+### Step 1: Identify the Bias Direction
+We isolate the specific axis in the 300D space that represents the bias.
+* **Process:** Take pairs of gender-definitional words (e.g., $e_{he} - e_{she}$, $e_{male} - e_{female}$) and find their average difference.
+* **Math:** In practice, researchers use **Singular Value Decomposition (SVD)** to find a "Bias Subspace" and a "Non-Bias Subspace" (the remaining 299 dimensions).
+
+
+
+### Step 2: Neutralize (For Non-Definitional Words)
+For words where gender is not part of the definition (e.g., "Doctor," "Babysitter," "Programmer"), we project the vector onto the non-bias subspace.
+* **Goal:** This "zeroes out" the component of the word that points toward the bias axis. After this, "Doctor" is no longer mathematically "closer" to "Man" than to "Woman."
+
+### Step 3: Equalize (For Definitional Pairs)
+For words that *should* stay gendered (e.g., "Grandmother" vs. "Grandfather"), we ensure they are equidistant from the neutral axis.
+* **Goal:** If "Grandmother" is closer to "Babysitter" than "Grandfather" is, the model still has a latent bias. Equalization moves both words so they have the exact same similarity to all neutralized words.
+
+
+
+---
+
+## 2. Definitional vs. Neutral Words
+A key challenge is deciding which words to neutralize.
+* **Definitional Words:** "Boy," "Girl," "Fraternity," "Niece." These have biological or definitional gender and are kept as-is (but equalized).
+* **Neutral Words:** "Doctor," "Janitor," "Brilliant," "Kind." These should have zero bias.
+* **Heuristic:** The authors trained a **linear classifier** to automatically categorize words into these two groups, finding that the vast majority of words in English are (and should be) gender-neutral.
+
+---
+
+## 3. Real-World Impact
+Debiasing is not just a theoretical exercise; it has concrete consequences for social equity.
+
+| Application | Bias Risk | Debiasing Benefit |
+| :--- | :--- | :--- |
+| **Job Search** | Ranking male resumes higher for "Engineer" roles. | Ensures gender-neutral candidate discovery. |
+| **Loan Apps** | Associating low-income neighborhoods with high risk. | Promotes socioeconomic fairness in lending. |
+| **Criminal Justice** | Biased sentencing guidelines based on ethnicity. | Reduces systemic discrimination in legal AI. |
+
+---
+
+## 4. Current Limitations
+While these methods are effective, debiasing is an **active area of research**. Current algorithms can reduce explicit bias (like analogies), but subtle, "latent" biases can sometimes remain hidden in the high-dimensional relationships between words.
+
+---
