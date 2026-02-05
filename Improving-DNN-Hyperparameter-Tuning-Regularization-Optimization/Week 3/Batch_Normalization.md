@@ -96,3 +96,37 @@ To tune **Batch Size** or **Preprocessing**, you must subclass `kt.HyperModel` a
 
 ### 4. Analysis
 Always use **TensorBoard** with the **HPARAMS** tab. It allows you to see the "Parallel Coordinates" view, which reveals which hyperparameters are actually driving your model's success.
+
+# 📏 Sizing Hidden Layers: Rules of Thumb
+
+### 1. Structure
+* **Input/Output:** Fixed by the dataset dimensions.
+* **Hidden Layers:** Use a **constant width** for all hidden layers (easier to tune).
+* **First Layer:** Occasionally, making the very first hidden layer larger than the rest helps capture initial low-level features.
+
+### 2. The "Stretch Pants" Approach
+* **Philosophy:** Over-build the capacity, then constrain it with regularization.
+* **Avoid Bottlenecks:** Ensure no hidden layer is significantly smaller than the ones before it to prevent permanent data loss.
+
+### 3. Depth over Width
+* Increasing the **number of layers** (depth) is usually more effective than increasing the **number of neurons** (width).
+
+# ⚙️ Key Hyperparameter Tuning Tips
+
+### 1. Learning Rate (LR)
+* **Impact:** High. Controls how large the "steps" are during Gradient Descent.
+* **Finding the Best LR:** Use an **LR Finder** (increase LR exponentially and plot loss). Pick a value slightly before the loss starts to explode.
+
+### 2. Batch Size
+* **The GPU Factor:** Large batches utilize hardware better but may hurt generalization.
+* **LeCun's Rule:** "Friends don't let friends use batches > 32."
+* **Advanced Hack:** Use large batches + **Learning Rate Warmup** (starting small and ramping up) to get the best of both worlds.
+
+### 3. General Heuristics
+| Hyperparameter | Best Practice |
+| :--- | :--- |
+| **Optimizer** | Try **Adam** or **RMSProp** (covered in Ch 11) over basic SGD. |
+| **Iterations** | Use **Early Stopping** instead of a fixed number. |
+| **Activation** | **ReLU** for hidden layers; **Softmax/Sigmoid** for output. |
+
+> **⚠️ Critical Note:** Hyperparameters are interdependent. If you change the **Batch Size**, you almost always need to retune the **Learning Rate**.
