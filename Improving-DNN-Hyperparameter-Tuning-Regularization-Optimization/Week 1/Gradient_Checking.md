@@ -365,3 +365,26 @@ The Subclassing API is the most flexible way to build models, favoring **imperat
 
 ### 📝 Key Rule
 > **"Start with Sequential, move to Functional if you need branches, move to Subclassing ONLY if you need dynamic Python logic."**
+
+# 💾 Keras Model Saving & Loading Summary
+
+### 1. The Two Main Formats
+| Format | Extension / Path | Best For |
+| :--- | :--- | :--- |
+| **SavedModel** | Folder (e.g., `my_model/`) | Production, TF Serving, Cloud Deployment. |
+| **HDF5 / Keras** | `.h5` or `.keras` | Simple sharing, single-file storage. |
+
+### 2. Full Model vs. Weights
+* **`model.save()`**: Saves everything (Architecture + Weights + Optimizer). No source code needed to reload.
+* **`model.save_weights()`**: Saves only parameters. Requires the original Python code (model definition) to reload.
+
+### 3. Key Commands
+```python
+# Save and Load Full Model
+model.save("my_model", save_format="tf")
+new_model = tf.keras.models.load_model("my_model")
+
+# Save and Load Weights Only
+model.save_weights("my_weights.ckpt")
+model.load_weights("my_weights.ckpt")
+```
