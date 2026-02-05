@@ -344,3 +344,24 @@ model = models.Model(inputs=inputs, outputs=outputs)
 * **Object Detection:** Regression (coords) + Classification (label).
 * **Multitask Learning:** Learning related tasks simultaneously to improve feature extraction.
 * **Auxiliary Outputs:** Used as a regularization tool to ensure lower layers are learning effectively.
+
+# 🛠️ Keras Subclassing API
+
+The Subclassing API is the most flexible way to build models, favoring **imperative programming** over static blueprints. Sequential API and Functional API are declarative: we start by declaring which layers to use and how they should be connected. Then we feed the model some data for training or inference. So we can save, clone, share and analyze but it is static.
+
+### 🏗️ Structure
+1. **`__init__`**: Define all layers as attributes (`self.layer_name`).
+2. **`call()`**: Define the forward pass logic. This is where you connect layers and add Pythonic logic (`if`, `for`).
+
+### ✅ When to Use (Pros)
+* **Research & Innovation:** For experimental architectures not supported by standard APIs.
+* **Dynamic Logic:** When the model behavior needs to change based on the input data (loops, conditions).
+* **Low-level Control:** When you need to use raw `tf.operations`.
+
+### ❌ The Trade-offs (Cons)
+* **Harder to Debug:** Errors are only caught at runtime.
+* **Opaque Structure:** `model.summary()` cannot show layer connectivity.
+* **Static Analysis:** Keras cannot inspect the graph for optimizations or easy cloning.
+
+### 📝 Key Rule
+> **"Start with Sequential, move to Functional if you need branches, move to Subclassing ONLY if you need dynamic Python logic."**
