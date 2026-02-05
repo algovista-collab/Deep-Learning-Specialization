@@ -160,7 +160,9 @@ When building deep networks, choosing the right activation function prevents **V
 ### 🚀 Pro-Tip for Generalization
 > "In general: **GELU > ELU > ReLU**. If you are building a very deep MLP and don't want to use Batch Normalization, try **SELU** with **LeCun Normal** initialization."
 
-# 🚀 Advanced Activation Functions: SELU & GELU
+For the signal to flow properly, the authors argue that we need the variance of the outputs of each layer to be equal to the variance of its inputs,⁠ and we need the gradients to have equal variance before and after flowing through a layer in the reverse direction. It is actually not possible to guarantee both unless the layer has an equal number of inputs and outputs (these numbers are called the fan-in and fan-out of the layer). This was solved by Xavier or Glorot initialization.
+
+RELU suffers from a problem known as the dying ReLUs: during training, some neurons effectively “die”, meaning they stop outputting anything other than 0. In some cases, you may find that half of your network’s neurons are dead, especially if you used a large learning rate. A neuron dies when its weights get tweaked in such a way that the input of the ReLU function (i.e., the weighted sum of the neuron’s inputs plus its bias term) is negative for all instances in the training set. When this happens, it just keeps outputting zeros, and gradient descent does not affect it anymore because the gradient of the ReLU function is zero when its input is negative. Leaky ReLUs never die; they can go into a long coma, but they have a chance to eventually wake up.⁠
 
 ### 1. SELU (Scaled ELU)
 * **Purpose:** Enables **Self-Normalizing Neural Networks (SNNs)**.
