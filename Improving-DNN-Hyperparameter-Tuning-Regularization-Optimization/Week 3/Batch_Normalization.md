@@ -142,6 +142,8 @@ When building deep networks, choosing the right activation function prevents **V
 | **ELU** | Smooth, allows negative values. | Faster convergence than ReLU. |
 | **SELU** | **Self-normalizing** (Mean 0, Std 1). | Very deep MLPs (Dense layers only). |
 
+ELU: It takes on negative values when z < 0, which allows the unit to have an average output closer to 0 and helps alleviate the vanishing gradients problem. The hyperparameter α defines the opposite of the value that the ELU function approaches when z is a large negative number. It is usually set to 1, but you can tweak it like any other hyperparameter. It has a nonzero gradient for z < 0, which avoids the dead neurons. problem. If α is equal to 1 then the function is smooth everywhere, including around z = 0, which helps speed up gradient descent since it does not bounce as much to the left and right of z = 0.
+
 ### 2. The Modern Standard: GELU (Gaussian Error Linear Unit)
 * **Formula:** $GELU(z) = z \Phi(z)$ (where $\Phi$ is the Gaussian CDF).
 * **The "Wiggle":** It is non-monotonic (it dips slightly below 0 before going up).
