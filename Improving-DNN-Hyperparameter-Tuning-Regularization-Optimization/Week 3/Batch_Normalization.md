@@ -74,3 +74,25 @@ Just as we normalize input features to speed up learning, BN normalizes the **pr
 This is the phenomenon where the distribution of a layer's inputs changes as the parameters of the previous layers change. 
 * **Batch Norm's Solution:** It ensures that no matter how the previous layers change, the mean and variance of the current layer's inputs remain stable.
 * **Result:** It allows each layer of the network to learn more independently of other layers.
+
+# 🧪 Keras Tuner: Summary of Hyperparameter Search
+
+Hyperparameter tuning automates the "trial and error" process of building neural networks.
+
+### 1. The Search Strategies
+| Strategy | How it works | Best Use Case |
+| :--- | :--- | :--- |
+| **Random Search** | Random guesses. | Simple, non-complex problems. |
+| **Hyperband** | "Tournament" style; kills bad models early. | Fast exploration of many architectures. |
+| **Bayesian Opt.** | Uses math to "predict" the best settings. | Finding the absolute peak performance. |
+
+### 2. Key Terms
+* **Oracle:** The algorithm that picks the next trial's values.
+* **Trial:** A single "experiment" (one model architecture trained once).
+* **Objective:** The metric the tuner is trying to maximize (e.g., `val_accuracy`).
+
+### 3. Tuning Beyond Layers
+To tune **Batch Size** or **Preprocessing**, you must subclass `kt.HyperModel` and override the `fit()` method.
+
+### 4. Analysis
+Always use **TensorBoard** with the **HPARAMS** tab. It allows you to see the "Parallel Coordinates" view, which reveals which hyperparameters are actually driving your model's success.
