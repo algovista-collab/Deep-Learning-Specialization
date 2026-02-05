@@ -75,9 +75,9 @@ This is the phenomenon where the distribution of a layer's inputs changes as the
 * **Batch Norm's Solution:** It ensures that no matter how the previous layers change, the mean and variance of the current layer's inputs remain stable.
 * **Result:** It allows each layer of the network to learn more independently of other layers.
 
-# 🧪 Keras Tuner: Summary of Hyperparameter Search
+## Keras Tuner: Summary of Hyperparameter Search
 
-Hyperparameter tuning automates the "trial and error" process of building neural networks.
+For complex problems, deep networks have a much higher parameter efficiency than shallow ones: they can model complex functions using exponentially fewer neurons than shallow nets, allowing them to reach much better performance with the same amount of training data.Hyperparameter tuning automates the "trial and error" process of building neural networks.
 
 ### 1. The Search Strategies
 | Strategy | How it works | Best Use Case |
