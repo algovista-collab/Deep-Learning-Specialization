@@ -388,3 +388,23 @@ new_model = tf.keras.models.load_model("my_model")
 model.save_weights("my_weights.ckpt")
 model.load_weights("my_weights.ckpt")
 ```
+
+# 🛠️ Experiment Management: Callbacks & TensorBoard
+
+### 1. Essential Callbacks
+* **Automatic Saving:** `ModelCheckpoint` saves the model so you don't lose progress if a crash occurs.
+* **Early Stopping:** `EarlyStopping` prevents overfitting and saves time by killing "dead-end" training runs.
+* **Synergy:** Use both together to save the best version of the model while stopping as soon as learning plateaus.
+
+### 2. Monitoring with TensorBoard
+* **Setup:** Use the `TensorBoard()` callback to log data to a directory.
+* **Best Practice:** Use timestamps in your log directory names (`run_2024...`) to keep different experiments (e.g., different learning rates) separated.
+* **Viewing:** Run `%tensorboard --logdir=./my_logs` in a notebook to see the UI.
+
+### 3. Custom Logic Template
+```python
+class MyCustomCallback(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        # Your logic here (e.g., custom logging, sending an email)
+        pass
+```
