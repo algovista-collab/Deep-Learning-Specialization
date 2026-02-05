@@ -191,3 +191,5 @@ RELU suffers from a problem known as the dying ReLUs: during training, some neur
 | **SELU** | Deep MLPs (Dense only) | LeCun Normal | No Batch Norm needed (Self-norms) |
 | **GELU** | Transformers / NLP | He Normal | State-of-the-art accuracy |
 | **ELU** | General Deep Nets | He Normal | Faster convergence than ReLU |
+
+Swish is probably a better default for more complex tasks, and you can even try parametrized Swish with a learnable β parameter for the most complex tasks. Mish may give you slightly better results, but it requires a bit more compute. If you care a lot about runtime latency, then you may prefer leaky ReLU, or parametrized leaky ReLU for more complex tasks. For deep MLPs, give SELU a try, but make sure to respect the constraints listed earlier. If you have spare time and computing power, you can use cross-validation to evaluate other activation functions as well.
