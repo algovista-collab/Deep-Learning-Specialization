@@ -130,3 +130,30 @@ Always use **TensorBoard** with the **HPARAMS** tab. It allows you to see the "P
 | **Activation** | **ReLU** for hidden layers; **Softmax/Sigmoid** for output. |
 
 > **⚠️ Critical Note:** Hyperparameters are interdependent. If you change the **Batch Size**, you almost always need to retune the **Learning Rate**.
+
+# 📈 Advanced Activation Functions Summary
+
+When building deep networks, choosing the right activation function prevents **Vanishing Gradients** and **Dead Neurons**.
+
+### 1. The ELU Family
+| Function | Key Characteristic | Best Use Case |
+| :--- | :--- | :--- |
+| **ReLU** | Simple, fast, but can "die" if $z < 0$. | Baseline / Simple models. |
+| **ELU** | Smooth, allows negative values. | Faster convergence than ReLU. |
+| **SELU** | **Self-normalizing** (Mean 0, Std 1). | Very deep MLPs (Dense layers only). |
+
+### 2. The Modern Standard: GELU (Gaussian Error Linear Unit)
+* **Formula:** $GELU(z) = z \Phi(z)$ (where $\Phi$ is the Gaussian CDF).
+* **The "Wiggle":** It is non-monotonic (it dips slightly below 0 before going up).
+* **Why it wins:** It consistently outperforms ReLU/ELU in complex tasks like NLP (Transformers).
+* **Trade-off:** More computationally expensive (use the sigmoid approximation $z\sigma(1.702z)$ for speed).
+
+### 3. Implementation Checklist
+| Feature | ELU | SELU | GELU |
+| :--- | :--- | :--- | :--- |
+| **Keras String** | `activation="elu"` | `activation="selu"` | `activation="gelu"` |
+| **Initializer** | He Normal | **LeCun Normal** | He Normal |
+| **Constraint** | None | Must be a plain MLP | None |
+
+### 🚀 Pro-Tip for Generalization
+> "In general: **GELU > ELU > ReLU**. If you are building a very deep MLP and don't want to use Batch Normalization, try **SELU** with **LeCun Normal** initialization."
