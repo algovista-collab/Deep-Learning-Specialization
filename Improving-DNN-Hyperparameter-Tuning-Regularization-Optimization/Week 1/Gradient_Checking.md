@@ -223,3 +223,30 @@ If the algorithm fails Gradient Checking (meaning $d\boldsymbol{\theta}_{\text{a
 
 * **Locate the Bug:** Instead of checking the entire vector $d\boldsymbol{\theta}$ at once, look at the individual components to try to identify the bug.
     * Examine the individual derivative components like $d\mathbf{W}^{[l]}$ or $d\mathbf{b}^{[l]}$. Often, simple errors in the dimensions or the calculation of the bias gradients (e.g., $d\mathbf{b}^{[l]}$) are the culprits.
+
+# 📉 Training vs. Validation Curve Alignment
+
+In many deep learning frameworks (like Keras or PyTorch Lightning), training and validation errors are logged at different frequencies, leading to a "temporal lag" in visualizations.
+
+### 1. The Core Problem: Snapshot vs. Average
+* **Validation Error:** A **snapshot**. It is computed on the entire validation set only *after* the epoch is finished.
+* **Training Error:** A **running mean**. It is the average of the error from every batch *during* the epoch.
+
+### 2. The "Half-Epoch" Logic
+Because the training error is a cumulative average, the value reported at the end of Epoch 1 includes the very first (high-error) batches and the very last (low-error) batches. 
+* **Training Point:** Represents the model state at roughly **$t = 0.5$**.
+* **Validation Point:** Represents the model state at exactly **$t = 1.0$**.
+
+
+
+### 3. Why Shift the Curve?
+If you shift the training curve **0.5 epochs to the left**, you align the "average" performance with the "snapshot" performance.
+
+| Observation | Meaning |
+| :--- | :--- |
+| **Curves Overlap** | The model is generalizing perfectly; the gap was just a logging artifact. |
+| **Training < Validation** | Even after the shift, the model is likely **overfitting**. |
+| **Training > Validation** | Common in early training due to **Regularization** (like Dropout) being active during training but disabled during validation. |
+
+### 🛠 Summary for Implementation
+> "When plotting, subtract 0.5 from the X-axis of your training metrics to see the true relationship between learning and generalization."
