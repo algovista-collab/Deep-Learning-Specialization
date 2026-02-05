@@ -250,3 +250,80 @@ If you shift the training curve **0.5 epochs to the left**, you align the "avera
 
 ### 🛠 Summary for Implementation
 > "When plotting, subtract 0.5 from the X-axis of your training metrics to see the true relationship between learning and generalization."
+
+# 🤖 Keras API Comparison: Sequential vs. Functional
+
+In Keras, there are two primary ways to build models. Choosing the right one depends on the complexity of your architecture.
+
+---
+
+## 1. Sequential API (The "Stack")
+The Sequential API is a linear stack of layers. It is the most common way to build models for beginners and simple tasks.
+
+* **Logic:** One layer flows directly into the next.
+* **Constraint:** Exactly **one input** and **one output**. No branching, no skipping.
+
+
+
+### ✅ Pros
+* Extremely simple and readable.
+* Ideal for 90% of standard deep learning problems (Classifiers, simple CNNs).
+* Minimal boilerplate code.
+
+### ❌ Cons
+* Cannot share layers.
+* Cannot handle multiple inputs (e.g., Image + Metadata).
+* Cannot handle multiple outputs (e.g., Object Detection: Class + Bounding Box).
+* Cannot create **Residual (Skip) Connections**.
+
+---
+
+## 2. Functional API (The "Graph")
+The Functional API treats layers like functions. You define a tensor, pass it through a layer, and receive a new tensor.
+
+* **Logic:** A Directed Acyclic Graph (DAG).
+* **Flexibility:** Layers can be connected in any way imaginable.
+
+
+
+### ✅ Pros
+* **Complex Topologies:** Supports branching, merging, and skip connections.
+* **Multi-Input/Output:** Essential for advanced models (e.g., Siamese networks, Transformers).
+* **Layer Reusability:** Use the same layer instance multiple times in the graph.
+
+### ❌ Cons
+* More "verbose" (requires explicit `Input` definition).
+* Slightly steeper learning curve.
+
+---
+
+## 📊 Feature Comparison Table
+
+| Feature | Sequential API | Functional API |
+| :--- | :--- | :--- |
+| **Structure** | Linear Stack | Directed Acyclic Graph (DAG) |
+| **Ease of Use** | High (Beginner) | Medium (Intermediate) |
+| **Skip Connections** | ❌ No | ✅ Yes |
+| **Multiple Inputs** | ❌ No | ✅ Yes |
+| **Multiple Outputs** | ❌ No | ✅ Yes |
+| **Layer Sharing** | ❌ No | ✅ Yes |
+
+---
+
+## 💡 Quick Code Reference
+
+### Sequential Example
+```python
+model = models.Sequential([
+    layers.Dense(64, activation='relu', input_shape=(32,)),
+    layers.Dense(10, activation='softmax')
+])
+```
+
+### Functional Example
+```python
+inputs = layers.Input(shape=(32,))
+x = layers.Dense(64, activation='relu')(inputs)
+outputs = layers.Dense(10, activation='softmax')(x)
+model = models.Model(inputs=inputs, outputs=outputs)
+```
