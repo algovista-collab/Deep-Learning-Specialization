@@ -155,5 +155,35 @@ When building deep networks, choosing the right activation function prevents **V
 | **Initializer** | He Normal | **LeCun Normal** | He Normal |
 | **Constraint** | None | Must be a plain MLP | None |
 
+<img width="867" height="553" alt="image" src="https://github.com/user-attachments/assets/4a2168da-e22d-4cd7-b938-ed9530813fd5" />
+
 ### 🚀 Pro-Tip for Generalization
 > "In general: **GELU > ELU > ReLU**. If you are building a very deep MLP and don't want to use Batch Normalization, try **SELU** with **LeCun Normal** initialization."
+
+# 🚀 Advanced Activation Functions: SELU & GELU
+
+### 1. SELU (Scaled ELU)
+* **Purpose:** Enables **Self-Normalizing Neural Networks (SNNs)**.
+* **Mechanism:** Maintains a mean of 0 and variance of 1 across layers automatically.
+* **Implementation Requirements:**
+    * `activation="selu"`
+    * `kernel_initializer="lecun_normal"`
+    * Input features must be standardized.
+* **Constraint:** Only works for sequential Dense layers. Do NOT use with skip connections or standard Dropout.
+
+### 2. GELU (Gaussian Error Linear Unit)
+* **Standard:** The default for modern Transformers (BERT, GPT).
+* **Behavior:** A smooth, non-monotonic variant of ReLU that dips slightly below zero.
+* **Formula:** $GELU(z) = z \Phi(z)$
+* **Fast Approximation:** $z \cdot \text{sigmoid}(1.702z)$
+* **Pros:** Generally outperforms all other functions on complex tasks.
+* **Cons:** Slower to compute than ReLU.
+
+---
+
+### 💡 Quick Comparison Table
+| Function | Best Use Case | Initializer | Key Benefit |
+| :--- | :--- | :--- | :--- |
+| **SELU** | Deep MLPs (Dense only) | LeCun Normal | No Batch Norm needed (Self-norms) |
+| **GELU** | Transformers / NLP | He Normal | State-of-the-art accuracy |
+| **ELU** | General Deep Nets | He Normal | Faster convergence than ReLU |
