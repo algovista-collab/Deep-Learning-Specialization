@@ -327,3 +327,20 @@ x = layers.Dense(64, activation='relu')(inputs)
 outputs = layers.Dense(10, activation='softmax')(x)
 model = models.Model(inputs=inputs, outputs=outputs)
 ```
+
+# 🏗️ Advanced Functional API Architectures
+
+### 1. Wide & Deep Models
+* **Wide Path:** Captures simple rules/memorization.
+* **Deep Path:** Captures complex patterns/generalization.
+* **Mechanism:** Concatenates the raw input with the output of the deep stack before the final layer.
+
+### 2. Multi-Input Models
+* Used when different paths require different feature subsets.
+* **Key Code:** `model = Model(inputs=[in_1, in_2], outputs=[out])`.
+* **Data Entry:** Feed data as a list `[X1, X2]` or a dict `{"name": X1}`.
+
+### 3. Multi-Output Models
+* **Object Detection:** Regression (coords) + Classification (label).
+* **Multitask Learning:** Learning related tasks simultaneously to improve feature extraction.
+* **Auxiliary Outputs:** Used as a regularization tool to ensure lower layers are learning effectively.
