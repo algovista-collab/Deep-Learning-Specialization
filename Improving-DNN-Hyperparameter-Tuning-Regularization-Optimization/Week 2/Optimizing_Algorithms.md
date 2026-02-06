@@ -368,3 +368,60 @@ While effective, this approach is limited and less integrated with modern deep l
 - High flexibility
 - Native Keras integration
 - Excellent TensorBoard support
+- Keras Tuner is more powerful and flexible than Scikit-Learn wrappers
+- RandomSearch is simple and effective
+- Hyperband efficiently allocates training resources
+- Bayesian Optimization intelligently explores the search space
+- TensorBoard integration is crucial for understanding results
+- Subclassing HyperModel enables tuning beyond model architecture
+
+# Bayesian Optimization & Practical Guidelines for MLP Architecture Design
+
+## Bayesian Optimization in Keras Tuner
+
+### Exploration vs. Exploitation
+Bayesian Optimization balances:
+- **Exploration**: trying new, uncertain regions of the hyperparameter space
+- **Exploitation**: focusing on regions already known to perform well
+
+This balance is controlled by the **beta** hyperparameter:
+- `beta` → higher values = more exploration
+- Default value: **2.6**
+
+Another key hyperparameter:
+- **alpha**: expected noise level in performance measurements across trials  
+  - Default: `1e-4`
+
+### Using the Bayesian Optimization Tuner
+Aside from these parameters, the tuner is used just like `RandomSearch` or `Hyperband`.
+
+AutoML refers to systems that automate large parts of the ML workflow:
+Model selection
+Architecture design
+Hyperparameter tuning
+Sometimes even training itself
+
+## Practical Guidelines for Designing MLPs
+
+### Number of Hidden Layers
+- Start with **1–2 hidden layers** for many problems
+
+**MNIST examples:**
+- **1 hidden layer** (a few hundred neurons): achieves **>97% accuracy**
+- **2 hidden layers** (same total number of neurons): achieves **>98% accuracy**
+
+**For more complex problems:**
+- Gradually **increase network depth** until **overfitting** starts to appear
+
+**For very complex tasks** (e.g., large-scale image classification, speech recognition):
+- Use **dozens or even hundreds of layers**
+- These are typically **not fully connected**
+- **Almost always rely on pretrained models** rather than training from scratch
+
+---
+
+### Number of Neurons per Hidden Layer
+- Use the **same number of neurons in all hidden layers**
+  - Performs **as well as or better** in most cases
+  - **Reduces the number of hyperparameters**
+  - Makes models **simpler and easier to tune**
