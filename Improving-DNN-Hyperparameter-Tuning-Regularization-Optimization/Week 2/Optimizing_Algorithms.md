@@ -328,3 +328,43 @@ When $\beta$ is large (e.g., 0.9 or 0.99):
 ## Visualizing the Plateau Escape
 
 In a high-dimensional space, the "plateau" around a saddle point is the biggest enemy. Algorithms with "memory" (weighted averages) are essential because they provide the kinetic energy needed to exit these flat regions where the raw gradient is nearly zero.
+
+# Hyperparameter Tuning in Keras with Keras Tuner — Detailed Summary
+
+## Why Hyperparameter Tuning Matters
+Neural networks are extremely flexible, which is both a strength and a weakness. Even for a simple Multilayer Perceptron (MLP), there are many hyperparameters to choose from, including:
+
+- Network architecture (number of layers, neurons per layer)
+- Activation functions
+- Weight initialization
+- Optimizer type
+- Learning rate
+- Batch size
+- Number of training epochs
+- Data preprocessing choices
+
+Finding the best combination manually is impractical, so automated hyperparameter tuning is essential.
+
+---
+
+## Traditional Approach: Scikit-Learn Wrappers
+One option is to wrap Keras models as Scikit-Learn estimators using **SciKeras**:
+
+- `KerasRegressor`
+- `KerasClassifier`
+
+These can then be tuned using:
+- `GridSearchCV`
+- `RandomizedSearchCV`
+
+While effective, this approach is limited and less integrated with modern deep learning workflows.
+
+---
+
+## Preferred Approach: Keras Tuner
+**Keras Tuner** is a dedicated hyperparameter tuning library for Keras that offers:
+
+- Multiple tuning strategies
+- High flexibility
+- Native Keras integration
+- Excellent TensorBoard support
