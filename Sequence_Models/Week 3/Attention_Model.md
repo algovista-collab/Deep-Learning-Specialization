@@ -532,3 +532,54 @@ $$\tilde{h}_t = \sum_{i} \alpha_{(t,i)} y_{(i)}$$
 Where $\alpha$ is the Softmax of the alignment scores:
 
 $$\alpha_{(t,i)} = \frac{\exp(e_{(t,i)})}{\sum_{i'} \exp(e_{(t,i')})}$$
+
+# The Transformer Architecture: Beyond RNNs
+
+The Transformer replaces recurrence (RNNs) entirely with **Attention**, allowing for massive parallelization. It consists of an Encoder stack and a Decoder stack (typically $N=6$ layers deep).
+
+
+
+### 1. The Core Components (The "Familiar" Stuff)
+Each layer in the stack contains:
+* **Skip Connections:** Residual connections to prevent vanishing gradients.
+* **Layer Normalization:** Applied after each sub-layer.
+* **Feed-Forward Networks (FFN):** Two dense layers (ReLU activation on the first, no activation on the second).
+* **Time-Distributed Processing:** Every word is treated independently by these layers, necessitating the "new" components to capture context.
+
+---
+
+### 2. The Three Flavors of Multi-Head Attention
+
+The Transformer uses three distinct types of attention to build word representations:
+
+| Type | Location | Function |
+| :--- | :--- | :--- |
+| **Self-Attention** | Encoder | Each word attends to **all other words** in the input sentence to enrich its own meaning (e.g., "bank" vs "river bank"). |
+| **Masked Self-Attention** | Decoder | **Causal Layer:** A word can only attend to words *before* it in the sequence to prevent "cheating" by looking at future tokens. |
+| **Cross-Attention** | Decoder | The decoder attends to the encoder's final representations. This is where the source (English) and target (Spanish) are aligned. |
+
+---
+
+### 3. Positional Encodings
+Because Transformers process all words in parallel, they have no inherent sense of word order (unlike RNNs).
+* **The Fix:** A **Positional Encoding** (a dense vector) is added to the word embedding.
+* **Purpose:** It gives the model "coordinates" for where each word sits in the sentence. Without it, the model would treat a shuffled sentence exactly the same as an ordered one.
+
+
+
+---
+
+### 4. Keys, Queries, and Values ($K, Q, V$)
+The "language" of the attention layer consists of three vectors:
+1.  **Queries ($Q$):** What the current word is looking for.
+2.  **Keys ($K$):** What each word in the sequence can offer.
+3.  **Values ($V$):** The actual information to be extracted once a match is found.
+
+> **Note on flow:** In **Self-Attention**, $Q, K, \text{and } V$ all come from the same previous layer. In **Cross-Attention**, $K \text{ and } V$ come from the Encoder, while $Q$ comes from the Decoder.
+
+---
+
+### 5. Architectural Summary
+* **N = 6:** The standard depth for both encoder and decoder stacks.
+* **Dropout:** Sprinkled after attention layers and feed-forward modules for regularization.
+* **Final Layer:** A Dense layer with **Softmax** to predict the probability of the next word in the vocabulary.
