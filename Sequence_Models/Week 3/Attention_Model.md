@@ -583,3 +583,42 @@ The "language" of the attention layer consists of three vectors:
 * **N = 6:** The standard depth for both encoder and decoder stacks.
 * **Dropout:** Sprinkled after attention layers and feed-forward modules for regularization.
 * **Final Layer:** A Dense layer with **Softmax** to predict the probability of the next word in the vocabulary.
+
+# Positional Encodings: Giving Order to Chaos
+
+In an RNN, information flows sequentially, so the model "knows" that word A comes before word B. Transformers, however, process all words in a sentence simultaneously to speed up training. This makes them **permutation invariant**—they see a sentence as a "bag of words" rather than an ordered sequence.
+
+### 1. The Problem: The "Bag of Words" Limitation
+Because the attention mechanism looks at every word in relation to every other word at the same time, the model loses all information about word order. Without help, a Transformer would treat the sentence "The cat chased the dog" exactly the same as "The dog chased the cat."
+
+### 2. The Solution: Injecting Position
+To fix this, we add a **Positional Encoding** vector to each word's embedding. This acts like a "coordinate" or "timestamp" for the word's location within the sequence.
+
+* **Additive Nature:** The position information is added to the word embedding (it doesn't replace it).
+* **Information Fusion:** By combining the meaning of the word (the embedding) with its location (the encoding), the model can distinguish between words with identical meanings but different functional roles in a sentence.
+
+
+
+---
+
+### 3. Fixed vs. Trainable Encodings
+There are two main ways to assign these "coordinates":
+
+* **Trainable Encodings:** The model learns the best positional representation during training. This is simple but limits the model to a fixed sequence length (you can't test it on a sentence longer than what it saw during training).
+* **Fixed Encodings (Sine/Cosine):** Using trigonometric functions to create a pattern. This is the method used in the original Transformer paper.
+
+### 4. Why Sine and Cosine?
+Using oscillating waves provides unique mathematical advantages:
+
+* **Uniqueness:** Every position $p$ gets a unique signature across the embedding dimensions.
+* **Relative Distance:** Because of trigonometric identities, the model can easily learn to attend to *relative* positions (e.g., "focus on the word two spots to my left") regardless of how long the sentence is.
+* **Extrapolation:** Unlike fixed-length tables, sine/cosine patterns are defined for any value of $p$, allowing the model to potentially handle sequences longer than those encountered during training.
+
+
+
+---
+
+### 5. Key Takeaways
+* **No recurrence needed:** Positional encodings allow Transformers to achieve the performance of RNNs while remaining fully parallelizable.
+* **Broadcasting:** The encoding is applied to the entire input block, ensuring every word knows exactly where it sits in the sequence hierarchy.
+* **Dimensionality:** The encodings must match the embedding size of the model so they can be merged directly into the input flow.
